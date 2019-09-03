@@ -18,6 +18,7 @@ import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -33,12 +34,17 @@ public class MainActivity extends ActionBarActivity {
 	private List<Marcacao> mMarcacoes;
 	private int mPositivoDia;
 	private int mNegativoDia;
+	private boolean mNotificacao;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		Intent intent = getIntent();
+		mNotificacao = intent.getBooleanExtra("notificacao", false);
+		Log.i("BANCOHORAS", String.valueOf(mNotificacao));
 
 		mMarcacoes = new ArrayList<Marcacao>();
 		mDbHelper = new DBHelper(this);
@@ -56,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void disparaNotificacao(Date hora) {
+		Log.i("BANCOHORAS", "disparaNotificacao:" + hora);
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Intent notificationIntent = new Intent(getApplicationContext(), NotificationReceiver.class);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
@@ -67,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void cancelaNotificacao() {
+		Log.i("BANCOHORAS", "cancelaNotificacao");
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Intent notificationIntent = new Intent(getApplicationContext(), NotificationReceiver.class);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
@@ -154,7 +162,9 @@ public class MainActivity extends ActionBarActivity {
 		int minutosEntrada = mMarcacoes.get(0).getHora() * 60 + mMarcacoes.get(0).getMinuto();
 		int minutosTrabalhados = 0;
 		
-		cancelaNotificacao();
+		if (!mNotificacao) {
+			cancelaNotificacao();
+		}
 
 		if (mMarcacoes.size() > 1) {
 			btnSaida.setVisibility(View.VISIBLE);
@@ -166,7 +176,12 @@ public class MainActivity extends ActionBarActivity {
 				if (minutosTrabalhados >= 540) {
 					mPositivoDia = minutosTrabalhados - 540;
 				} else {
-					mNegativoDia = 540 - minutosTrabalhados;
+					if (minutosTrabalhados > 360) {
+						// só desconta almoço se tiver mais de 6 horas trabalhadas
+						mNegativoDia = 540 - minutosTrabalhados;
+					} else {
+						mNegativoDia = 480 - minutosTrabalhados;
+					}
 				}
 			} else {
 				mPositivoDia += minutosTrabalhados;
@@ -181,15 +196,16 @@ public class MainActivity extends ActionBarActivity {
 			minutosTrabalhados = minutosAgora - minutosEntrada;
 			if (diaUtil(agora)) {
 				mNegativoDia = 480 - minutosTrabalhados;
-				int minutosSair = minutosAgora + mNegativoDia - mPositivoDia;
+				int minutosSair = minutosAgora + mNegativoDia - mPositivoDia + 60;
 				lblSair.setVisibility(View.VISIBLE);
 				lblSair.setText(
 						"Sair " + String.format("%02d:%02d", minutosSair/60, minutosSair%60));
-				System.out.println("teste1:" + agora);
 				Date sair = new Date();
 				sair.setHours(minutosSair / 60);
 				sair.setMinutes(minutosSair % 60);
-				disparaNotificacao(sair);
+				if (!mNotificacao) {
+					disparaNotificacao(sair);
+				}
 				
 			} else {
 				mPositivoDia += minutosTrabalhados;	

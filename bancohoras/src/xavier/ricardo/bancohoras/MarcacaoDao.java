@@ -79,7 +79,12 @@ public class MarcacaoDao {
 						if (minutosTrabalhados >= 540) {
 							positivo += (minutosTrabalhados - 540);
 						} else {
-							negativo += (540 - minutosTrabalhados);
+							if (minutosTrabalhados > 360) {
+								// só desconta almoço se tiver mais de 6 horas trabalhadas
+								negativo += (540 - minutosTrabalhados);
+							} else {
+								negativo += (480 - minutosTrabalhados);
+							}
 						}						
 					} else {
 						positivo += minutosTrabalhados;
@@ -163,6 +168,7 @@ public class MarcacaoDao {
 		return saldo;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static Saldo saldoQuadrimestre(SQLiteDatabase db, int ano, int mes) {
 		
 		int positivo = 0;
@@ -171,9 +177,17 @@ public class MarcacaoDao {
 		int q = (mes - 1) / 4;
 		int mesIni = q * 4 + 1;
 		
+		Date hoje = new Date();
+		int anoAtual = hoje.getYear() + 1900;
+		int mesAtual = hoje.getMonth() + 1;
+		
 		for (int m = mesIni; m < mesIni + 4; m++) {
 			Saldo saldoMes = saldoMes(db, ano, m);
-			positivo += saldoMes.getPositivo();
+			if ((ano == anoAtual) && (m == mesAtual)) {
+				positivo += saldoMes.getPositivo();
+			} else {
+				positivo += saldoMes.getPositivo() * 1.25;
+			}
 			negativo += saldoMes.getNegativo();
 		}
 		

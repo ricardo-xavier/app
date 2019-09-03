@@ -14,6 +14,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         vibrator.vibrate(3000);
         Intent main = new Intent(context, MainActivity.class);
         main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        main.putExtra("notificacao", true);
         context.startActivity(main);
 	}
 
