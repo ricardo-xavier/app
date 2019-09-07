@@ -14,8 +14,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -39,6 +39,8 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
+		setTitle("Banco de Horas v1.8");
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
@@ -155,66 +157,66 @@ public class MainActivity extends ActionBarActivity {
 			return;
 		}
 
+		if (!mNotificacao) {
+			cancelaNotificacao();
+		}
+		
+		// mostra a matcação de entrada
 		btnEntrada.setVisibility(View.VISIBLE);
 		btnEntrada.setText(
 				"Entrada " + String.format("%02d:%02d", mMarcacoes.get(0).getHora(), mMarcacoes.get(0).getMinuto()));
 
 		int minutosEntrada = mMarcacoes.get(0).getHora() * 60 + mMarcacoes.get(0).getMinuto();
 		int minutosTrabalhados = 0;
-		
-		if (!mNotificacao) {
-			cancelaNotificacao();
-		}
 
 		if (mMarcacoes.size() > 1) {
+			// mostra a marcação de saída
 			btnSaida.setVisibility(View.VISIBLE);
 			btnSaida.setText(
 					"Saída " + String.format("%02d:%02d", mMarcacoes.get(1).getHora(), mMarcacoes.get(1).getMinuto()));
+
+			// calcula o tempo trabalhado
 			int minutosSaida = mMarcacoes.get(1).getHora() * 60 + mMarcacoes.get(1).getMinuto();
 			minutosTrabalhados = minutosSaida - minutosEntrada;
-			if (diaUtil(mData)) {
-				if (minutosTrabalhados >= 540) {
-					mPositivoDia = minutosTrabalhados - 540;
-				} else {
-					if (minutosTrabalhados > 360) {
-						// só desconta almoço se tiver mais de 6 horas trabalhadas
-						mNegativoDia = 540 - minutosTrabalhados;
-					} else {
-						mNegativoDia = 480 - minutosTrabalhados;
-					}
-				}
-			} else {
-				mPositivoDia += minutosTrabalhados;
-			}
-
+			
 		} else {
 
+			// mostra o horário previsto para saída
+			int minutosSair = minutosEntrada + 540;
+			lblSair.setVisibility(View.VISIBLE);
+			lblSair.setText(
+					"Sair " + String.format("%02d:%02d", minutosSair/60, minutosSair%60));
+			
+			// dispara o alarme de saída
+			Date sair = new Date();
+			sair.setHours(minutosSair / 60);
+			sair.setMinutes(minutosSair % 60);
+			if (!mNotificacao) {
+				disparaNotificacao(sair);
+			}
+			
+			// calcula o tempo trabalhado até o momento
 			Date agora = new Date();
 			int hora = agora.getHours();
 			int minuto = agora.getMinutes();
 			int minutosAgora = hora * 60 + minuto;
 			minutosTrabalhados = minutosAgora - minutosEntrada;
-			if (diaUtil(agora)) {
-				mNegativoDia = 480 - minutosTrabalhados;
-				int minutosSair = minutosAgora + mNegativoDia - mPositivoDia + 60;
-				lblSair.setVisibility(View.VISIBLE);
-				lblSair.setText(
-						"Sair " + String.format("%02d:%02d", minutosSair/60, minutosSair%60));
-				Date sair = new Date();
-				sair.setHours(minutosSair / 60);
-				sair.setMinutes(minutosSair % 60);
-				if (!mNotificacao) {
-					disparaNotificacao(sair);
-				}
-				
-			} else {
-				mPositivoDia += minutosTrabalhados;	
-				lblSair.setVisibility(View.GONE);
-			}
-			
-			
 		}
 
+		// desconta o tempo de almoço se trabalhou mais de 6 horas
+		if (minutosTrabalhados > 360) {
+			minutosTrabalhados -= 60;
+		}
+		
+		if (diaUtil(mData)) {
+			if (minutosTrabalhados >= 480) {
+				mPositivoDia = minutosTrabalhados - 480;
+			} else {
+				mNegativoDia = 480 - minutosTrabalhados;
+			}
+		} else {
+			mPositivoDia = minutosTrabalhados;
+		}
 	}
 
 	private boolean diaUtil(Date data) {
@@ -227,13 +229,15 @@ public class MainActivity extends ActionBarActivity {
 			Toast.makeText(this, "Já foram registradas duas marcações no dia.", Toast.LENGTH_LONG).show();
 			return;
 		}
+		
+		Date agora = new Date();
 
 		Marcacao marcacao = new Marcacao();
 		marcacao.setAno(mData.getYear() + 1900);
 		marcacao.setMes(mData.getMonth() + 1);
 		marcacao.setDia(mData.getDate());
-		marcacao.setHora(mData.getHours());
-		marcacao.setMinuto(mData.getMinutes());
+		marcacao.setHora(agora.getHours());
+		marcacao.setMinuto(agora.getMinutes());
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		MarcacaoDao.inclui(db, marcacao);
 		db.close();
@@ -250,7 +254,6 @@ public class MainActivity extends ActionBarActivity {
 		intent.putExtra("minuto", marcacao.getMinuto());
 		intent.putExtra("indice", 0);
 		startActivityForResult(intent, 1);
-
 	}
 
 	public void alteraSaida(View v) {
@@ -261,7 +264,6 @@ public class MainActivity extends ActionBarActivity {
 		intent.putExtra("minuto", marcacao.getMinuto());
 		intent.putExtra("indice", 1);
 		startActivityForResult(intent, 1);
-
 	}
 
 	@Override
@@ -279,7 +281,7 @@ public class MainActivity extends ActionBarActivity {
             int hora = data.getIntExtra("hora", 0);
             int minuto = data.getIntExtra("minuto", 0);
             Marcacao marcacao = mMarcacoes.get(indice);
-            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
             MarcacaoDao.altera(db, marcacao, hora, minuto);
             db.close();
     		carregaMarcacoes();
@@ -289,7 +291,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
         Marcacao marcacao = mMarcacoes.get(indice);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         MarcacaoDao.exclui(db, marcacao);
         db.close();
 		carregaMarcacoes();

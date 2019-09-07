@@ -75,16 +75,14 @@ public class MarcacaoDao {
 					int minutosEntrada = marcacaoAnterior.getHora() * 60 + marcacaoAnterior.getMinuto();
 					int minutosSaida = marcacao.getHora() * 60 + marcacao.getMinuto();
 					int minutosTrabalhados = minutosSaida - minutosEntrada;
+					if (minutosTrabalhados > 360) {
+						minutosTrabalhados -= 60;
+					}
 					if (diaUtil(marcacao)) {
-						if (minutosTrabalhados >= 540) {
-							positivo += (minutosTrabalhados - 540);
+						if (minutosTrabalhados >= 480) {
+							positivo += (minutosTrabalhados - 480);
 						} else {
-							if (minutosTrabalhados > 360) {
-								// só desconta almoço se tiver mais de 6 horas trabalhadas
-								negativo += (540 - minutosTrabalhados);
-							} else {
-								negativo += (480 - minutosTrabalhados);
-							}
+							negativo += (480 - minutosTrabalhados);
 						}						
 					} else {
 						positivo += minutosTrabalhados;
@@ -122,6 +120,9 @@ public class MarcacaoDao {
 			int minutosAgora = hora * 60 + minuto;
 			int minutosEntrada = marcacaoAnterior.getHora() * 60 + marcacaoAnterior.getMinuto();
 			int minutosTrabalhados = minutosAgora - minutosEntrada;
+			if (minutosTrabalhados > 360) {
+				minutosTrabalhados -= 60;
+			}
 			negativo += (480 - minutosTrabalhados);
 			
 		}
