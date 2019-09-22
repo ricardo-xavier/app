@@ -39,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		setTitle("Banco de Horas v1.8");
+		setTitle("Banco de Horas v1.11");
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -111,7 +111,12 @@ public class MainActivity extends ActionBarActivity {
 		int saldoDia = mPositivoDia - mNegativoDia;
 		grid.add(String.format("%02d:%02d", mPositivoDia / 60, mPositivoDia % 60));
 		grid.add(String.format("%02d:%02d", mNegativoDia / 60, mNegativoDia % 60));
-		grid.add(String.format("%02d:%02d", saldoDia / 60, saldoDia % 60));
+		if (saldoDia >= 0) {
+			grid.add(String.format("%02d:%02d", saldoDia / 60, saldoDia % 60));
+		} else {
+			int saldo = saldoDia * -1;
+			grid.add(String.format("-%02d:%02d", saldo / 60, saldo % 60));
+		}
 
 		grid.add("Mês");
 		db = mDbHelper.getReadableDatabase();
@@ -120,7 +125,12 @@ public class MainActivity extends ActionBarActivity {
 		grid.add(String.format("%02d:%02d", saldoMes.getPositivo() / 60, saldoMes.getPositivo() % 60));
 		grid.add(String.format("%02d:%02d", saldoMes.getNegativo() / 60, saldoMes.getNegativo() % 60));
 		int saldo = saldoMes.getPositivo() - saldoMes.getNegativo();
-		grid.add(String.format("%02d:%02d", saldo / 60, saldo % 60));
+		if (saldo >= 0) {
+			grid.add(String.format("%02d:%02d", saldo / 60, saldo % 60));
+		} else {
+			saldo = saldo * -1;
+			grid.add(String.format("-%02d:%02d", saldo / 60, saldo % 60));
+		}
 
 		grid.add("Quad.");
 		db = mDbHelper.getReadableDatabase();
@@ -129,7 +139,12 @@ public class MainActivity extends ActionBarActivity {
 		grid.add(String.format("%02d:%02d", saldoQ.getPositivo() / 60, saldoQ.getPositivo() % 60));
 		grid.add(String.format("%02d:%02d", saldoQ.getNegativo() / 60, saldoQ.getNegativo() % 60));
 		saldo = saldoQ.getPositivo() - saldoQ.getNegativo();
-		grid.add(String.format("%02d:%02d", saldo / 60, saldo % 60));
+		if (saldo >= 0) {
+			grid.add(String.format("%02d:%02d", saldo / 60, saldo % 60));
+		} else {
+			saldo = saldo * -1;
+			grid.add(String.format("-%02d:%02d", saldo / 60, saldo % 60));
+		}
 
 		GridView gvResumo = (GridView) findViewById(R.id.gvResumo);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, grid);
@@ -187,16 +202,17 @@ public class MainActivity extends ActionBarActivity {
 			lblSair.setText(
 					"Sair " + String.format("%02d:%02d", minutosSair/60, minutosSair%60));
 			
+			Date agora = new Date();
+			
 			// dispara o alarme de saída
 			Date sair = new Date();
 			sair.setHours(minutosSair / 60);
 			sair.setMinutes(minutosSair % 60);
-			if (!mNotificacao) {
+			if (!mNotificacao && (sair.getTime() > agora.getTime())) {
 				disparaNotificacao(sair);
 			}
 			
 			// calcula o tempo trabalhado até o momento
-			Date agora = new Date();
 			int hora = agora.getHours();
 			int minuto = agora.getMinutes();
 			int minutosAgora = hora * 60 + minuto;

@@ -184,10 +184,11 @@ public class MarcacaoDao {
 		
 		for (int m = mesIni; m < mesIni + 4; m++) {
 			Saldo saldoMes = saldoMes(db, ano, m);
-			if ((ano == anoAtual) && (m == mesAtual)) {
-				positivo += saldoMes.getPositivo();
-			} else {
-				positivo += saldoMes.getPositivo() * 1.25;
+			positivo += saldoMes.getPositivo();
+			if ((ano == anoAtual) && (m < mesAtual)
+					&& (saldoMes.getPositivo() > saldoMes.getNegativo())) {
+				int saldo = saldoMes.getPositivo() - saldoMes.getNegativo();
+				positivo += (saldo * 1.25);
 			}
 			negativo += saldoMes.getNegativo();
 		}
