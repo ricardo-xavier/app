@@ -80,6 +80,13 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <CheckBox
+        android:id="@+id/chkFalta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="falta"
+        android:text="@string/falta" />
+
     <GridView
         android:id="@+id/gvResumo"
         android:layout_width="match_parent"

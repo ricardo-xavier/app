@@ -7,6 +7,7 @@ public class Marcacao {
 	private int dia;
 	private int hora;
 	private int minuto;
+	private boolean falta;
 	public int getAno() {
 		return ano;
 	}
@@ -36,6 +37,12 @@ public class Marcacao {
 	}
 	public void setMinuto(int minuto) {
 		this.minuto = minuto;
+	}
+	public boolean isFalta() {
+		return falta;
+	}
+	public void setFalta(boolean falta) {
+		this.falta = falta;
 	}
 
 }

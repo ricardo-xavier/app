@@ -30,6 +30,12 @@ public class MarcacaoDao {
 			marcacao.setAno(ano);
 			marcacao.setMes(mes);
 			marcacao.setDia(dia);
+			if (hora == 99) {
+				hora = 0;
+				marcacao.setFalta(true);
+			} else {
+				marcacao.setFalta(false);
+			}
 			marcacao.setHora(hora);
 			marcacao.setMinuto(minuto);
 			marcacoes.add(marcacao);
@@ -62,6 +68,11 @@ public class MarcacaoDao {
 			int dia = res.getInt(res.getColumnIndex("DIA"));
 			int hora = res.getInt(res.getColumnIndex("HORA"));
 			int minuto = res.getInt(res.getColumnIndex("MINUTO"));
+			if (hora == 99) {
+				negativo += 480;
+				res.moveToNext();
+				continue;
+			}
 			marcacao.setAno(ano);
 			marcacao.setMes(mes);
 			marcacao.setDia(dia);
@@ -188,7 +199,7 @@ public class MarcacaoDao {
 			if ((ano == anoAtual) && (m < mesAtual)
 					&& (saldoMes.getPositivo() > saldoMes.getNegativo())) {
 				int saldo = saldoMes.getPositivo() - saldoMes.getNegativo();
-				positivo += (saldo * 1.25);
+				positivo += (saldo * 0.25);
 			}
 			negativo += saldoMes.getNegativo();
 		}
@@ -208,6 +219,20 @@ public class MarcacaoDao {
 		contentValues.put("DIA", marcacao.getDia());
 		contentValues.put("HORA", marcacao.getHora());
 		contentValues.put("MINUTO", marcacao.getMinuto());
+		db.insert("MARCACOES", null, contentValues);
+		
+		recalculaMes(db, marcacao.getAno(), marcacao.getMes());
+		
+	}
+	
+	public static void incluiFalta(SQLiteDatabase db, Marcacao marcacao) {
+		
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("ANO", marcacao.getAno());
+		contentValues.put("MES", marcacao.getMes());
+		contentValues.put("DIA", marcacao.getDia());
+		contentValues.put("HORA", 99);
+		contentValues.put("MINUTO", 0);
 		db.insert("MARCACOES", null, contentValues);
 		
 		recalculaMes(db, marcacao.getAno(), marcacao.getMes());
@@ -257,6 +282,20 @@ public class MarcacaoDao {
 						String.valueOf(marcacao.getDia()),
 						String.valueOf(marcacao.getHora()),
 						String.valueOf(marcacao.getMinuto())
+						});
+		recalculaMes(db, marcacao.getAno(), marcacao.getMes());
+	}
+
+	public static void excluiFalta(SQLiteDatabase db, Marcacao marcacao) {
+		
+		db.delete("MARCACOES", 
+				"ANO = ? and MES = ? and DIA = ? and HORA = ? and MINUTO = ?", 
+				new String[] { 
+						String.valueOf(marcacao.getAno()),
+						String.valueOf(marcacao.getMes()),
+						String.valueOf(marcacao.getDia()),
+						String.valueOf(99),
+						String.valueOf(0)
 						});
 		recalculaMes(db, marcacao.getAno(), marcacao.getMes());
 	}

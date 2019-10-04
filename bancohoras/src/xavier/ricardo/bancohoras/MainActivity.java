@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		setTitle("Banco de Horas v1.11");
+		setTitle("Banco de Horas v1.13");
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -161,14 +162,18 @@ public class MainActivity extends ActionBarActivity {
 		Button btnEntrada = (Button) findViewById(R.id.btnEntrada);
 		Button btnSaida = (Button) findViewById(R.id.btnSaida);
 		TextView lblSair = (TextView) findViewById(R.id.lblSair);
+		CheckBox chkFalta = (CheckBox) findViewById(R.id.chkFalta);
 
 		mPositivoDia = 0;
 		mNegativoDia = 0;
 		btnEntrada.setVisibility(View.GONE);
 		btnSaida.setVisibility(View.GONE);
 		lblSair.setVisibility(View.GONE);
+		chkFalta.setVisibility(View.GONE);
 
 		if (mMarcacoes.size() == 0) {
+			chkFalta.setVisibility(View.VISIBLE);
+			chkFalta.setChecked(false);
 			return;
 		}
 
@@ -176,7 +181,15 @@ public class MainActivity extends ActionBarActivity {
 			cancelaNotificacao();
 		}
 		
-		// mostra a matcação de entrada
+		if (mMarcacoes.get(0).isFalta()) {
+			chkFalta.setVisibility(View.VISIBLE);
+			chkFalta.setChecked(true);
+			mPositivoDia = 0;
+			mNegativoDia = 480;
+			return;
+		}
+		
+		// mostra a marcação de entrada
 		btnEntrada.setVisibility(View.VISIBLE);
 		btnEntrada.setText(
 				"Entrada " + String.format("%02d:%02d", mMarcacoes.get(0).getHora(), mMarcacoes.get(0).getMinuto()));
@@ -262,6 +275,27 @@ public class MainActivity extends ActionBarActivity {
 		atualizaResumo();
 	}
 
+	public void falta(View v) {
+		
+		boolean checked = ((CheckBox) v).isChecked();
+		
+		Marcacao marcacao = new Marcacao();
+		marcacao.setAno(mData.getYear() + 1900);
+		marcacao.setMes(mData.getMonth() + 1);
+		marcacao.setDia(mData.getDate());
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		if (checked) {
+			MarcacaoDao.incluiFalta(db, marcacao);
+		} else {
+			MarcacaoDao.excluiFalta(db, marcacao);
+		}
+		db.close();
+
+		carregaMarcacoes();
+		atualizaResumo();
+		
+	}
+	
 	public void alteraEntrada(View v) {
 
 		Marcacao marcacao = mMarcacoes.get(0);
