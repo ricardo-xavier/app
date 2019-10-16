@@ -46,7 +46,7 @@ public class PedidoDao {
 		
 		if (cursor.next()) {
 		
-			String codArea = cursor.getString("COD_AREA");
+			String codArea = getString(cursor, "COD_AREA");
 			Area area = null;
 			for (Area a : pedido.getAreas()) {
 				if (a.getCodigo().contentEquals(codArea)) {
@@ -64,14 +64,14 @@ public class PedidoDao {
 			Item item = new Item();
 			
 			int seq = cursor.getInt("SEQ_ITEM");
-			String codProduto = cursor.getString("COD_PRODUTO");
-			String subCodigo = cursor.getString("SUB_CODIGO");
+			String codProduto = getString(cursor, "COD_PRODUTO");
+			String subCodigo = getString(cursor, "SUB_CODIGO");
 			int qtde = cursor.getInt("QTD_ITEM");
-			String desMedidas = cursor.getString("DES_MEDIDAS");
+			String desMedidas = getString(cursor, "DES_MEDIDAS");
 			double preco = cursor.getDouble("VLR_PRECO");
-			String desProduto = cursor.getString("DES_PRODUTO");
-			String txtProduto = cursor.getString("TXT_PRODUTO");
-			String codEspecificos = cursor.getString("COD_ESPECIFICOS");
+			String desProduto = getString(cursor, "DES_PRODUTO");
+			String txtProduto = getString(cursor, "TXT_PRODUTO");
+			String codEspecificos = getString(cursor, "COD_ESPECIFICOS");
 			
 			item.setSeq(seq);
 			item.setCodProduto(codProduto);
@@ -104,8 +104,8 @@ public class PedidoDao {
 				
 		if (cursor.next()) {
 		
-			String codVendedor = cursor.getString("COD_VENDEDOR");
-			codCliente = cursor.getString("COD_CLIENTE");
+			String codVendedor = getString(cursor, "COD_VENDEDOR");
+			codCliente = getString(cursor, "COD_CLIENTE");
 			pedido.setVendedor(codVendedor);
 			
 		}
@@ -126,7 +126,7 @@ public class PedidoDao {
 		
 		if (cursor.next()) {
 		
-			String observacao = cursor.getString("OBSERVACAO");
+			String observacao = getString(cursor, "OBSERVACAO");
 			if (observacao != null) {
 				pedido.setObservacao(observacao.replace("\r\n", "<br>"));
 			}
@@ -156,28 +156,28 @@ public class PedidoDao {
 				
 				cliente = new Cliente();
 		
-				String nomParceiro = cursor.getString("NOM_PARCEIRO");
-				String cpfCnpj = cursor.getString("NRO_CPF_CNPJ");
-				String ie = cursor.getString("NRO_INSCRICAO_ESTADUAL");
-				String im = cursor.getString("NRO_INSCRICAO_MUNICIPAL");
-				String rua = cursor.getString("DES_LOGRADOURO");
-				String numero = cursor.getString("NRO_ENDERECO");
-				String complemento = cursor.getString("DES_COMPLEMENTO");
-				String bairro = cursor.getString("NOM_BAIRRO");
-				String cidade = cursor.getString("NOM_CIDADE");
-				String estado = cursor.getString("COD_ESTADO");
-				String cep = cursor.getString("NRO_CEP");
-				String ruaEntrega = cursor.getString("DES_LOGRADOURO_ENTREGA");
-				String numeroEntrega = cursor.getString("NRO_ENDERECO_ENTREGA");
-				String complementoEntrega = cursor.getString("DES_COMPLEMENTO_ENTREGA");
-				String bairroEntrega = cursor.getString("NOM_BAIRRO_ENTREGA");
-				String cidadeEntrega = cursor.getString("NOM_CIDADE_ENTREGA");
-				String estadoEntrega = cursor.getString("COD_ESTADO_ENTREGA");
-				String cepEntrega = cursor.getString("NRO_CEP_ENTREGA");
-				String fone1 = cursor.getString("NRO_FONE1");
-				String fone2 = cursor.getString("NRO_FONE2");
-				String celular = cursor.getString("NRO_CELULAR");
-				String email = cursor.getString("DES_EMAIL");
+				String nomParceiro = getString(cursor, "NOM_PARCEIRO");
+				String cpfCnpj = getString(cursor, "NRO_CPF_CNPJ");
+				String ie = getString(cursor, "NRO_INSCRICAO_ESTADUAL");
+				String im = getString(cursor, "NRO_INSCRICAO_MUNICIPAL");
+				String rua = getString(cursor, "DES_LOGRADOURO");
+				String numero = getString(cursor, "NRO_ENDERECO");
+				String complemento = getString(cursor, "DES_COMPLEMENTO");
+				String bairro = getString(cursor, "NOM_BAIRRO");
+				String cidade = getString(cursor, "NOM_CIDADE");
+				String estado = getString(cursor, "COD_ESTADO");
+				String cep = getString(cursor, "NRO_CEP");
+				String ruaEntrega = getString(cursor, "DES_LOGRADOURO_ENTREGA");
+				String numeroEntrega = getString(cursor, "NRO_ENDERECO_ENTREGA");
+				String complementoEntrega = getString(cursor, "DES_COMPLEMENTO_ENTREGA");
+				String bairroEntrega = getString(cursor, "NOM_BAIRRO_ENTREGA");
+				String cidadeEntrega = getString(cursor, "NOM_CIDADE_ENTREGA");
+				String estadoEntrega = getString(cursor, "COD_ESTADO_ENTREGA");
+				String cepEntrega = getString(cursor, "NRO_CEP_ENTREGA");
+				String fone1 = getString(cursor, "NRO_FONE1");
+				String fone2 = getString(cursor, "NRO_FONE2");
+				String celular = getString(cursor, "NRO_CELULAR");
+				String email = getString(cursor, "DES_EMAIL");
 				
 				cliente.setNome(nomParceiro);
 				cliente.setCpfCnpj(cpfCnpj);
@@ -217,12 +217,12 @@ public class PedidoDao {
 				
 				Contato contato = new Contato();
 		
-				String nome = cursor.getString("NOM_CONTATO");
-				String papel = cursor.getString("DES_PAPEL");
-				String fone1 = cursor.getString("NRO_FONE1");
-				String fone2 = cursor.getString("NRO_FONE2");
-				String celular = cursor.getString("NRO_CELULAR");
-				String email = cursor.getString("DES_EMAIL");
+				String nome = getString(cursor, "NOM_CONTATO");
+				String papel = getString(cursor, "DES_PAPEL");
+				String fone1 = getString(cursor, "NRO_FONE1");
+				String fone2 = getString(cursor, "NRO_FONE2");
+				String celular = getString(cursor, "NRO_CELULAR");
+				String email = getString(cursor, "DES_EMAIL");
 				
 				contato.setNome(nome);
 				contato.setPapel(papel);
@@ -245,6 +245,11 @@ public class PedidoDao {
 		
 		return pedido;
 
+	}
+
+	private String getString(ResultSet cursor, String nome) throws SQLException {
+		String s = cursor.getString(nome);
+		return s != null ? s : "";
 	}
 		
 }

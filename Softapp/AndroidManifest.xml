@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="xavier.ricardo.softapp"
-    android:versionCode="16"
-    android:versionName="1.15" >
+    android:versionCode="17"
+    android:versionName="1.16" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -60,6 +60,11 @@
         <activity
             android:name=".DetalhesActivity"
             android:label="@string/title_activity_detalhes"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".AnexoActivity"
+            android:label="@string/title_activity_anexo"
             android:screenOrientation="portrait" >
         </activity>
     </application>

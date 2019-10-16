@@ -1,5 +1,7 @@
 package xavier.ricardo.softws.tipos;
 
+import java.util.List;
+
 public class Compromisso {
 	
 	private String hora;
@@ -21,6 +23,7 @@ public class Compromisso {
 	private String datOrcamento;
 	private int codOrcamento;
 	private int nroPedido;
+	private List<Anexo> anexos;
 	
 	public String getNatureza() {
 		return natureza;
@@ -135,6 +138,12 @@ public class Compromisso {
 	}
 	public void setNroPedido(int nroPedido) {
 		this.nroPedido = nroPedido;
+	}
+	public List<Anexo> getAnexos() {
+		return anexos;
+	}
+	public void setAnexos(List<Anexo> anexos) {
+		this.anexos = anexos;
 	}
 	
 

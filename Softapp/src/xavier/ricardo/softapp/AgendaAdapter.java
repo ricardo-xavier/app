@@ -120,6 +120,16 @@ public class AgendaAdapter extends BaseAdapter {
 		} else {
 			btDetalhes.setVisibility(View.INVISIBLE);			
 		}
+		
+		Button btAnexos = (Button) v.findViewById(R.id.btAnexos);
+		if ((compromisso.getAnexos() != null)
+				&& (compromisso.getAnexos().size() > 0)) {
+			btAnexos.setVisibility(View.VISIBLE);
+			btAnexos.setText(String.format("Anexos(%d)", 
+					compromisso.getAnexos().size()));
+		} else {
+			btAnexos.setVisibility(View.INVISIBLE);			
+		}
 
 		TextView tvPedido = (TextView) v.findViewById(R.id.tvPedido);
 		ImageButton ivPedido = (ImageButton) v.findViewById(R.id.ivPedido);

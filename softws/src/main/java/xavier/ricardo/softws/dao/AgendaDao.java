@@ -5,6 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +16,7 @@ import javax.naming.NamingException;
 
 import xavier.ricardo.softws.tipos.Agenda;
 import xavier.ricardo.softws.tipos.AgendaMes;
+import xavier.ricardo.softws.tipos.Anexo;
 import xavier.ricardo.softws.tipos.Compromisso;
 
 public class AgendaDao {
@@ -77,11 +81,13 @@ public class AgendaDao {
 			compromisso.setComplemento(complemento);
 			compromisso.setBairro(bairro);
 			compromisso.setCidade(cidade);
+			/*
 			System.out.println(hora + " " + natureza + " " + parceiro
 					+ " " + fone1 + " " + fone2 + " " + celular);
 			System.out.println(pendencia);
+			*/
 			if (pendencia.startsWith("Montagem Pedido: ")) {
-				String[] partes = pendencia.split(" ");
+				String[] partes = pendencia.replace("\r", " ").replace("\n", " ").split(" ");
 				String fornecedor = partes[2];
 				String dt = partes[3];
 				String orc = partes[4];
@@ -89,7 +95,7 @@ public class AgendaDao {
 				String a = partesData[2];
 				String m = partesData[1];
 				String pdf = "/usr/local/tomcat/webapps/ROOT/soft/pedidos/" + fornecedor + a + m + orc + "_1.pdf";
-				System.out.println(pdf);
+				//System.out.println(pdf);
 				
 				try {
 					compromisso.setCodFornecedor(fornecedor);
@@ -104,7 +110,7 @@ public class AgendaDao {
 					compromisso.setPedido(pdf);
 				} else {
 					pdf = "/usr/local/tomcat/webapps/ROOT/soft/pedidos/" + fornecedor + a + m + orc + ".pdf";
-					System.out.println(pdf);
+					//System.out.println(pdf);
 					if (new File(pdf).exists()) {
 						compromisso.setPedido(pdf);
 					} else {
@@ -119,12 +125,12 @@ public class AgendaDao {
 								m = m.substring(1);
 							}
 							pdf = "/usr/local/tomcat/webapps/ROOT/soft/pedidos/" + fornecedor + a + m + orc + "_1.pdf";
-							System.out.println(pdf);
+							//System.out.println(pdf);
 							if (new File(pdf).exists()) {
 								compromisso.setPedido(pdf);
 							} else {
 								pdf = "/usr/local/tomcat/webapps/ROOT/soft/pedidos/" + fornecedor + a + m + orc + ".pdf";
-								System.out.println(pdf);
+								//System.out.println(pdf);
 								if (new File(pdf).exists()) {
 									compromisso.setPedido(pdf);
 								}
@@ -133,7 +139,7 @@ public class AgendaDao {
 					}
 				}
 			}
-			System.out.println(compromisso.getPedido());
+			//System.out.println(compromisso.getPedido());
 			compromissos.add(compromisso);
 			
 		}
@@ -141,12 +147,60 @@ public class AgendaDao {
 		cursor.close();
 		cmd.close();		
 		
+		try {
+			carregaAnexos(bd, compromissos);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
 		bd.close();
 		
 		Agenda agenda = new Agenda();
 		agenda.setCompromissos(compromissos);
 		return agenda;
 
+	}
+
+	private void carregaAnexos(Connection bd, List<Compromisso> compromissos) throws SQLException, ParseException {
+		
+		String sql = "select COD_ANEXO, DES_ARQ_ANEXO, DES_CONTEUDO "
+				+ "from ANEXOS_ORCAMENTO "
+				+ "where COD_FORNECEDOR=? and DAT_ORCAMENTO=? and COD_ORCAMENTO=? ";
+
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		
+		for (Compromisso compromisso : compromissos) {
+			
+			compromisso.setAnexos(new ArrayList<Anexo>());
+			
+			String data = compromisso.getDatOrcamento();
+			if (data == null) {
+				continue;
+			}
+			cmd.setString(1, compromisso.getCodFornecedor());
+			cmd.setDate(2, new java.sql.Date(df.parse(data).getTime()));
+			cmd.setInt(3, compromisso.getCodOrcamento());
+
+			ResultSet cursor = cmd.executeQuery();
+			
+			while (cursor.next()) {
+			
+				String codigo = cursor.getString("COD_ANEXO");
+				String descricao = cursor.getString("DES_ARQ_ANEXO");
+				//String conteudo = cursor.getString("DES_CONTEUDO");
+				if (descricao.toLowerCase().trim().endsWith(".pdf")) {
+					Anexo anexo = new Anexo();
+					anexo.setCodigo(codigo);
+					compromisso.getAnexos().add(anexo);
+				}
+				
+			}
+			
+			cursor.close();
+		}
+		
+		cmd.close();
 	}
 
 	@SuppressWarnings("deprecation")

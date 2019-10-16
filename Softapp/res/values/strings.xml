@@ -17,5 +17,6 @@
     <string name="title_activity_endereco">SOFTPLACE-Agenda</string>
     <string name="title_activity_calendar">SOFTPLACE-Agenda</string>
     <string name="title_activity_detalhes">Dados do Pedido</string>
+    <string name="title_activity_anexo">Anexos</string>
 
 </resources>

@@ -6,8 +6,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
@@ -21,10 +23,13 @@ import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 
 import xavier.ricardo.softws.dao.AgendaDao;
+import xavier.ricardo.softws.dao.AnexoDao;
 import xavier.ricardo.softws.dao.PedidoDao;
 import xavier.ricardo.softws.dao.UsuarioDao;
 import xavier.ricardo.softws.tipos.Agenda;
 import xavier.ricardo.softws.tipos.AgendaMes;
+import xavier.ricardo.softws.tipos.Anexo;
+import xavier.ricardo.softws.tipos.Compromisso;
 import xavier.ricardo.softws.tipos.Pdf;
 import xavier.ricardo.softws.tipos.Pedido;
 import xavier.ricardo.softws.tipos.Usuarios;
@@ -43,7 +48,7 @@ public class SoftService {
 	public String login(@PathParam("usuario") String usuario, @PathParam("senha") String senha,
 			@PathParam("versao") String versao) {
 
-		System.out.println(new Date() + " login soft:" + usuario + " " + versao);
+		System.out.println(new Date() + " softws login: " + usuario + " " + versao);
 		try {
 			return UsuarioDao.login(usuario.toLowerCase(), senha);
 
@@ -57,7 +62,8 @@ public class SoftService {
 	@Path("/lista/{usuario}/{data}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAgenda(@PathParam("usuario") String usuario, @PathParam("data") String data) {
-		System.out.println(new Date() + " agenda soft:" + usuario + " " + data);
+		
+		System.out.println(new Date() + " softws agenda: " + usuario + " " + data);
 		try {
 			Agenda agenda = new AgendaDao().lista(usuario, data);
 			Gson gson = new Gson();
@@ -73,7 +79,8 @@ public class SoftService {
 	@Path("/listames/{usuario}/{data}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAgendaMes(@PathParam("usuario") String usuario, @PathParam("data") String data) {
-		System.out.println(new Date() + " agendames soft:" + usuario + " " + data);
+		
+		System.out.println(new Date() + " softws agendames: " + usuario + " " + data);
 		try {
 			AgendaMes agenda = new AgendaDao().listaMes(usuario, data);
 			Gson gson = new Gson();
@@ -89,7 +96,8 @@ public class SoftService {
 	@Path("/usuarios")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsuarios() {
-		System.out.println(new Date() + " usuarios soft");
+		
+		System.out.println(new Date() + " softws usuarios");
 		try {
 			Usuarios usuarios = new UsuarioDao().lista();
 			Gson gson = new Gson();
@@ -106,7 +114,8 @@ public class SoftService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public String adicionarLista(@PathParam("nome") String nome, String json) {
-		System.out.println("soft salva:" + nome);
+		
+		System.out.println(new Date() + " softws salva: " + nome);
 		Gson gson = new Gson();
 		Pdf pdf = gson.fromJson(json, Pdf.class);
 		byte[] data = Base64.getDecoder().decode(pdf.getConteudo());
@@ -128,7 +137,8 @@ public class SoftService {
 			@PathParam("data") String data,
 			@PathParam("orcamento") int codOrcamento,
 			@PathParam("pedido") int codPedido) {
-		System.out.println(new Date() + " pedido " + fornecedor + " " + data + " " + codOrcamento + " " + codPedido);
+		
+		System.out.println(new Date() + " softws pedido: " + fornecedor + " " + data + " " + codOrcamento + " " + codPedido);
 		try {
 			Pedido pedido = new PedidoDao().getPedido(fornecedor, data, codOrcamento, codPedido);
 			Gson gson = new Gson();
@@ -140,5 +150,25 @@ public class SoftService {
 		}
 	}
 	
+	@GET
+	@Path("/anexos/{fornecedor}/{data}/{orcamento}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAnexos(@PathParam("fornecedor") String fornecedor, 
+			@PathParam("data") String data,
+			@PathParam("orcamento") int codOrcamento) {
+		
+		System.out.println(new Date() + " softws getAnexos: " + fornecedor + " " + data + " " + codOrcamento);
+		try {
+			List<Anexo> anexos = AnexoDao.getAnexos(fornecedor, data, codOrcamento);
+			Compromisso compromisso = new Compromisso();
+			compromisso.setAnexos(anexos);
+			Gson gson = new Gson();
+			return gson.toJson(compromisso);
+
+		} catch (NamingException | SQLException | ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 }

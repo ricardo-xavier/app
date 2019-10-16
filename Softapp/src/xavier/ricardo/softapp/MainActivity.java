@@ -170,14 +170,35 @@ public class MainActivity extends ActionBarActivity {
 	}	
 	
 	public void detalhes(View v) {
-		Intent intent = new Intent(this, DetalhesActivity.class);
+		
 		Button btn = (Button) v;
-		String[] partes = btn.getText().toString().split(" ");
-		intent.putExtra("fornecedor", partes[0]);
-		intent.putExtra("data", partes[1]);
-		intent.putExtra("orcamento", partes[2].split("-")[0]);
-		intent.putExtra("pedido", partes[2].split("-")[1]);
-		startActivity(intent);
+		try {
+			Intent intent = new Intent(this, DetalhesActivity.class);
+			String[] partes = btn.getText().toString().split(" ");
+			intent.putExtra("fornecedor", partes[0]);
+			intent.putExtra("data", partes[1]);
+			intent.putExtra("orcamento", partes[2].split("-")[0]);
+			intent.putExtra("pedido", partes[2].split("-")[1]);
+			startActivity(intent);
+			
+		} catch (Exception e) {
+		}
+	}
+	
+	public void anexos(View v) {
+		
+		Button btn = (Button) findViewById(R.id.btDetalhes);
+		try {
+			Intent intent = new Intent(this, AnexoActivity.class);
+			String[] partes = btn.getText().toString().split(" ");
+			intent.putExtra("fornecedor", partes[0]);
+			intent.putExtra("data", partes[1]);
+			intent.putExtra("orcamento", partes[2].split("-")[0]);
+			startActivity(intent);
+			
+		} catch (Exception e) {
+		}
+			
 	}
 
 	private String tiraFormatacao(String fone) {
