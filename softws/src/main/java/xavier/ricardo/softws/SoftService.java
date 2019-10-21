@@ -165,7 +165,7 @@ public class SoftService {
 			Gson gson = new Gson();
 			return gson.toJson(compromisso);
 
-		} catch (NamingException | SQLException | ParseException e) {
+		} catch (NamingException | SQLException | ParseException | IOException e) {
 			e.printStackTrace();
 			return null;
 		}
