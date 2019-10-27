@@ -47,14 +47,30 @@ public class DetalhesActivity extends Activity {
 			html.append("<table border>");
 			Cliente cliente = pedido.getCliente();
 			html.append("<h3>Dados do Cliente</h3>");
-			html.append("<tr><td>Cliente</td><td>" + cliente.getNome() + "</td></tr>");
-			html.append("<tr><td>CPF/CNPJ</td><td>" + cliente.getCpfCnpj() + "</td></tr>");
-			html.append("<tr><td>Insc. Est.</td><td>" + cliente.getIe() + "</td></tr>");
-			html.append("<tr><td>Insc. Mun,</td><td>" + cliente.getIm() + "</td></tr>");
-			html.append("<tr><td>Endereço</td><td>" + cliente.getEndereco() + "</td></tr>");
-			html.append("<tr><td>Entrega</td><td>" + cliente.getEnderecoEntrega() + "</td></tr>");
-			html.append("<tr><td>Fones</td><td>" + cliente.getFone() + "</td></tr>");
-			html.append("<tr><td>Email</td><td>" + cliente.getEmail() + "</td></tr>");
+			if (preenchido(cliente.getNome())) {
+				html.append("<tr><td>Cliente</td><td>" + cliente.getNome() + "</td></tr>");
+			}
+			if (preenchido(cliente.getCpfCnpj())) {
+				html.append("<tr><td>CPF/CNPJ</td><td>" + cliente.getCpfCnpj() + "</td></tr>");
+			}
+			if (preenchido(cliente.getIe())) {
+				html.append("<tr><td>Insc. Est.</td><td>" + cliente.getIe() + "</td></tr>");
+			}
+			if (preenchido(cliente.getIm())) {
+				html.append("<tr><td>Insc. Mun,</td><td>" + cliente.getIm() + "</td></tr>");
+			}
+			if (preenchido(cliente.getEndereco())) {
+				html.append("<tr><td>Endereço</td><td>" + cliente.getEndereco() + "</td></tr>");
+			}
+			if (preenchido(cliente.getEnderecoEntrega())) {
+				html.append("<tr><td>Entrega</td><td>" + cliente.getEnderecoEntrega() + "</td></tr>");
+			}
+			if (preenchido(cliente.getFone())) {
+				html.append("<tr><td>Fones</td><td>" + cliente.getFone() + "</td></tr>");
+			}
+			if (preenchido(cliente.getEmail())) {
+				html.append("<tr><td>Email</td><td>" + cliente.getEmail() + "</td></tr>");
+			}
 			html.append("</table>");
 			/*
 			html.append("<h4>Contatos</h4>");
@@ -110,6 +126,10 @@ public class DetalhesActivity extends Activity {
 		WebView wvRegras = (WebView) findViewById(R.id.wvDelathes);
 		wvRegras.loadData(html.toString(), "text/html", "UTF-8");		
 		
+	}
+
+	private boolean preenchido(String s) {
+		return (s != null) && (s.replace("-", "").replace("0", "").trim().length() > 0);
 	}
 
 }

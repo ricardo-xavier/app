@@ -5,9 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -102,6 +106,8 @@ public class MainActivity extends ActionBarActivity {
 		startActivity(intent);
 
 	}
+	
+	
 
 	public void ligar(View v) {
 
@@ -112,6 +118,12 @@ public class MainActivity extends ActionBarActivity {
 		if (fones.length == 0) {
 			return;
 		}
+		
+		int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        	 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+        }		
 
 		if (fones.length == 1) {
 			String fone = fones[0];
