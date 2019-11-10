@@ -121,6 +121,14 @@ public class AgendaAdapter extends BaseAdapter {
 			btDetalhes.setVisibility(View.INVISIBLE);			
 		}
 		
+		Button btEncerrar = (Button) v.findViewById(R.id.btEncerrar);
+		btEncerrar.setVisibility(View.VISIBLE);
+		String chave = String.format("%s;%s;%s", 
+				compromisso.getUsuario(), compromisso.getData(), 
+				compromisso.getEncerramento() != null 
+				? compromisso.getEncerramento() : "");
+		btEncerrar.setTag(chave);
+		
 		Button btAnexos = (Button) v.findViewById(R.id.btAnexos);
 		if ((compromisso.getAnexos() != null)
 				&& (compromisso.getAnexos().size() > 0)) {

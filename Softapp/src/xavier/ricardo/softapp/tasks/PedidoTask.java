@@ -67,7 +67,7 @@ public class PedidoTask extends AsyncTask<String, Void, Pedido> {
 			int ano = Integer.parseInt(partes[2]);
 			String dataYMD = String.format("%04d-%02d-%02d", ano, mes, dia); 
 			String url = String.format("http://ricardoxavier.no-ip.org" 
-				+ "/soft-ws2/softws/pedido/%s/%s/%s/%s",
+				+ "/soft-ws3/softws/pedido/%s/%s/%s/%s",
 				fornecedor, dataYMD, codOrcamento, codPedido);
 			//Log.i("SOFTAPP", url);
 			

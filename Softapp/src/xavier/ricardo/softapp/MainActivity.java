@@ -106,8 +106,6 @@ public class MainActivity extends ActionBarActivity {
 		startActivity(intent);
 
 	}
-	
-	
 
 	public void ligar(View v) {
 
@@ -233,5 +231,33 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return ddd + prefixo + sufixo;
 	}
+	
+	public void encerrar(View v) {
+
+		String chave = (String) v.getTag();
+		Intent intent = new Intent(this, EncerrarActivity.class);
+		intent.putExtra("chave", chave);
+		startActivityForResult(intent, 1);
+		
+	}	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			String chave = data.getStringExtra("chave");
+			String[] partes = chave.split(";");
+			String usuario = partes[0].trim();
+			String dt = partes[1].trim();
+			String observacao = partes.length > 2 ? partes[2] : "";
+			for (Compromisso compromisso : agenda.getCompromissos()) {
+				if (compromisso.getUsuario().trim().equals(usuario)
+						&& compromisso.getData().trim().equals(dt)) {
+					compromisso.setEncerramento(observacao);
+					break;
+				}
+			}
+		}
+	}
+	
 
 }

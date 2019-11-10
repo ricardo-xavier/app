@@ -6,9 +6,9 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:background="@color/red"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="@color/red" >
 
         <TextView
             android:id="@+id/tvTitulo"
@@ -34,9 +34,9 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <LinearLayout
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/tvParceiro"
@@ -48,22 +48,20 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
-        
+            android:layout_weight="1" />
+
         <ImageButton
             android:id="@+id/ibEndereco"
-            android:onClick="endereco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="endereco"
             android:src="@drawable/endereco" />
-
     </LinearLayout>
 
     <LinearLayout
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/tvContato"
@@ -71,13 +69,12 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    </LinearLayout>    
+    </LinearLayout>
 
     <LinearLayout
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/tvFones"
@@ -89,16 +86,14 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
-        
+            android:layout_weight="1" />
+
         <ImageButton
             android:id="@+id/ibLigar"
-            android:onClick="ligar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="ligar"
             android:src="@drawable/fone" />
-        
     </LinearLayout>
 
     <LinearLayout
@@ -119,13 +114,34 @@
             android:layout_height="wrap_content"
             android:onClick="anexos"
             android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal" >
+
+        <Button
+            android:id="@+id/btEncerrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="encerrar"
+            android:text="@string/encerrar" />
+
+        <ImageButton
+            android:id="@+id/ibFoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_action_camera_light" />
         
     </LinearLayout>
-    
+
     <LinearLayout
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/tvPedido"
@@ -137,22 +153,20 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
-        
+            android:layout_weight="1" />
+
         <ImageButton
             android:id="@+id/ivPedido"
-            android:onClick="abrir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="abrir"
             android:src="@drawable/pdf" />
-        
-    </LinearLayout>    
-    
+    </LinearLayout>
+
     <LinearLayout
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/tvOrcamento"
@@ -164,16 +178,14 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
-        
+            android:layout_weight="1" />
+
         <ImageButton
             android:id="@+id/ivOrcamento"
-            android:onClick="abrirOrcamento"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="abrirOrcamento"
             android:src="@drawable/pdf" />
-        
     </LinearLayout>
-        
+
 </LinearLayout>

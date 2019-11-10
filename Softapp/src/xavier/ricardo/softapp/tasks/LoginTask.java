@@ -56,7 +56,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 		try {
 			
 			String url = String.format("http://ricardoxavier.no-ip.org" 
-				+ "/soft-ws2/softws/login/%s/%s/%s",
+				+ "/soft-ws3/softws/login/%s/%s/%s",
 				usuario, senha, VERSAO);
 			//Log.i("SOFTAPP", url);
 			

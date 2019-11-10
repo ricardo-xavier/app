@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="xavier.ricardo.softapp"
-    android:versionCode="18"
-    android:versionName="1.17" >
+    android:versionCode="21"
+    android:versionName="1.20" >
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="26" />
+        android:targetSdkVersion="28" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -65,6 +65,11 @@
         <activity
             android:name=".AnexoActivity"
             android:label="@string/title_activity_anexo"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".EncerrarActivity"
+            android:label="@string/title_activity_encerrar"
             android:screenOrientation="portrait" >
         </activity>
     </application>

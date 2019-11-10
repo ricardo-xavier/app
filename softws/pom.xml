@@ -132,7 +132,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>soft-ws2</finalName>
+		<finalName>soft-ws3</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

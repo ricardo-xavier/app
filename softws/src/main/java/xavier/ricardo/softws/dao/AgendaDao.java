@@ -21,13 +21,13 @@ import xavier.ricardo.softws.tipos.Compromisso;
 
 public class AgendaDao {
 
-	//http://localhost:8080/soft-ws2/softws/lista/fernando.maciel/2018-08-01
+	//http://ricardoxavier.no-ip.org/soft-ws3/softws/lista/fabiana.ferrari/2019-10-16
 	@SuppressWarnings("deprecation")
-	public Agenda lista(String usuario, String data) throws NamingException, SQLException {
+	public Agenda lista(String responsavel, String data) throws NamingException, SQLException {
 		
 		List<Compromisso> compromissos = new ArrayList<Compromisso>();
 		
-		String sql = String.format("select a.DAT_PREVISAO, a.COD_NATUREZA, a.COD_PARCEIRO, a.DES_PENDENCIA, "
+		String sql = String.format("select a.COD_USUARIO, a.DAT_AGENDAMENTO, a.DAT_PREVISAO, a.COD_NATUREZA, a.COD_PARCEIRO, a.DES_PENDENCIA, a.DES_ENCERRAMENTO, "
 				+ "a.COD_CONTATO, c.DES_PAPEL, c.NRO_FONE1, c.NRO_FONE2, c.NRO_CELULAR, p.DES_LOGRADOURO, p.NRO_ENDERECO, "
 				+ "p.DES_COMPLEMENTO, p.NOM_BAIRRO, p.NOM_CIDADE "
 				+ "from AGENDA a "
@@ -35,7 +35,7 @@ public class AgendaDao {
 				+ "left outer join CONTATOS c on c.COD_PARCEIRO = a.COD_PARCEIRO and c.COD_CONTATO = a.COD_CONTATO "
 				+ "where a.COD_RESPONSAVEL='%s' "
 				+ "and a.DAT_PREVISAO between ? and ? and a.DAT_SOLUCAO is null order by a.DAT_PREVISAO",
-				usuario);
+				responsavel);
 
 		int ano = Integer.parseInt(data.substring(0, 4));
 		int mes = Integer.parseInt(data.substring(5, 7));
@@ -48,10 +48,14 @@ public class AgendaDao {
 		cmd.setDate(1, new java.sql.Date(datai.getTime()));
 		cmd.setDate(2, new java.sql.Date(dataf.getTime()));
 		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
 		ResultSet cursor = cmd.executeQuery();
 		while (cursor.next()) {
 			
 			Compromisso compromisso = new Compromisso();
+			String usuario = cursor.getString("COD_USUARIO");
+			Date datAgendamento = new Date(cursor.getDate("DAT_AGENDAMENTO").getTime());
 			Date datPrevisao = new Date(cursor.getDate("DAT_PREVISAO").getTime());
 			String hora = String.format("%02d:%02d", datPrevisao.getHours(), datPrevisao.getMinutes());
 			String natureza = cursor.getString("COD_NATUREZA");
@@ -67,6 +71,9 @@ public class AgendaDao {
 			String complemento = cursor.getString("DES_COMPLEMENTO");
 			String bairro = cursor.getString("NOM_BAIRRO");
 			String cidade = cursor.getString("NOM_CIDADE");
+			String encerramento = cursor.getString("DES_ENCERRAMENTO");
+			compromisso.setUsuario(usuario);
+			compromisso.setData(df.format(datAgendamento));
 			compromisso.setHora(hora);
 			compromisso.setNatureza(natureza);
 			compromisso.setParceiro(parceiro);
@@ -81,6 +88,7 @@ public class AgendaDao {
 			compromisso.setComplemento(complemento);
 			compromisso.setBairro(bairro);
 			compromisso.setCidade(cidade);
+			compromisso.setEncerramento(encerramento);
 			/*
 			System.out.println(hora + " " + natureza + " " + parceiro
 					+ " " + fone1 + " " + fone2 + " " + celular);
@@ -250,6 +258,24 @@ public class AgendaDao {
 		AgendaMes agenda = new AgendaMes();
 		agenda.setDias(dias);
 		return agenda;
+	}
+
+	public static void encerra(String usuario, String data, String observacao) throws SQLException, NamingException {
+		
+		String sql = String.format("update AGENDA set "
+				+ " DAT_APP = ? "
+				+ ",DES_ENCERRAMENTO = ? "
+				+ "where COD_USUARIO='%s' "
+				+ "and DAT_AGENDAMENTO='%s'",
+				usuario, data);
+		
+		Connection bd = BancoDados.conecta();
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		cmd.setDate(1, new java.sql.Date(new Date().getTime()));
+		cmd.setString(2, observacao);
+		cmd.executeUpdate();
+		cmd.close();
+		bd.close();
 	}
 
 }

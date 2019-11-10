@@ -18,7 +18,7 @@ import xavier.ricardo.softws.tipos.Pedido;
 
 public class PedidoDao {
 
-	//http://ricardoxavier.no-ip.org/soft-ws2/softws/pedido/TECNOFLEX/2019-05-10/57/334
+	//http://ricardoxavier.no-ip.org/soft-ws3/softws/pedido/TECNOFLEX/2019-05-10/57/334
 	@SuppressWarnings("deprecation")
 	public Pedido getPedido(String fornecedor, String data, int codOrcamento, int codPedido) throws NamingException, SQLException {
 

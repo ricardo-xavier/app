@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Compromisso {
 	
+	private String usuario;
+	private String data;
 	private String hora;
 	private String natureza;
 	private String parceiro;
@@ -25,6 +27,7 @@ public class Compromisso {
 	private int codOrcamento;
 	private int nroPedido;	
 	private List<Anexo> anexos;
+	private String encerramento;
 	
 	public String getNatureza() {
 		return natureza != null ? natureza.trim() : null;
@@ -151,6 +154,24 @@ public class Compromisso {
 	}
 	public void setAnexos(List<Anexo> anexos) {
 		this.anexos = anexos;
+	}
+	public String getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+	public String getData() {
+		return data;
+	}
+	public void setData(String data) {
+		this.data = data;
+	}
+	public String getEncerramento() {
+		return encerramento;
+	}
+	public void setEncerramento(String encerramento) {
+		this.encerramento = encerramento;
 	}
 
 }

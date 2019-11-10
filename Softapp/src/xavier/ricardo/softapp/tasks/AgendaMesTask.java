@@ -60,7 +60,7 @@ public class AgendaMesTask extends AsyncTask<String, Void, AgendaMes> {
 			String dataStr = String.format("%04d-%02d-%02d", 
 					data.get(Calendar.YEAR), data.get(Calendar.MONTH)+1, data.get(Calendar.DATE));
 			String url = String.format("http://ricardoxavier.no-ip.org" 
-				+ "/soft-ws2/softws/listames/%s/%s",
+				+ "/soft-ws3/softws/listames/%s/%s",
 				usuario.toLowerCase(), dataStr);
 			//Log.i("SOFTAPP", url);
 			

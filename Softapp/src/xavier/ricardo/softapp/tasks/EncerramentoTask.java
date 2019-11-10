@@ -7,7 +7,8 @@ import java.io.InputStreamReader;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.google.gson.Gson;
@@ -15,16 +16,22 @@ import com.google.gson.Gson;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import xavier.ricardo.softapp.CalendarActivity;
-import xavier.ricardo.softapp.Usuarios;
+import xavier.ricardo.softapp.Encerramento;
+import xavier.ricardo.softapp.EncerrarActivity;
 
-public class UsuariosTask extends AsyncTask<String, Void, Usuarios> {
+public class EncerramentoTask extends AsyncTask<String, Void, String> {
 	
-	private CalendarActivity contexto;
+	private EncerrarActivity contexto;
 	private ProgressDialog progress;
+	private String usuario;
+	private String data;
+	private String observacao;
 	
-	public UsuariosTask(CalendarActivity contexto) {
+	public EncerramentoTask(EncerrarActivity contexto, String usuario, String data, String observacao) {
 		this.contexto = contexto;
+		this.usuario = usuario;
+		this.observacao = observacao;
+		this.data = data;
 	}
 	
 	@Override
@@ -36,10 +43,10 @@ public class UsuariosTask extends AsyncTask<String, Void, Usuarios> {
 	}
 	
 	@Override
-	protected void onPostExecute(Usuarios result) {
+	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
 		progress.dismiss();
-		contexto.resultadoUsuarios(result);
+		contexto.resultado(result);
 	}
 	
 	@Override
@@ -48,18 +55,29 @@ public class UsuariosTask extends AsyncTask<String, Void, Usuarios> {
 	}
 
 	@Override
-	protected Usuarios doInBackground(String... params) {
+	protected String doInBackground(String... params) {
 		
 		try {
 			
-			String url = "http://ricardoxavier.no-ip.org" 
-				+ "/soft-ws3/softws/usuarios";
+			String url = "http://ricardoxavier.no-ip.org/soft-ws3/softws/encerra";
 			//Log.i("SOFTAPP", url);
 			
 			HttpClient httpClient = new DefaultHttpClient();
+			 
+			HttpPost httpPost = new HttpPost(url);
+			httpPost.addHeader("content-type", "application/json");
 			
-			HttpGet httpGet = new HttpGet(url);
-			HttpResponse httpResponse = httpClient.execute(httpGet);
+			Encerramento encerramento = new Encerramento();
+			encerramento.setUsuario(usuario);
+			encerramento.setData(data);
+			encerramento.setObservacao(observacao);
+			
+			Gson gson = new Gson();
+			String json = gson.toJson(encerramento, Encerramento.class);
+			
+            httpPost.setEntity(new ByteArrayEntity(json.getBytes()));			
+			
+			HttpResponse httpResponse = httpClient.execute(httpPost);
 			
 			InputStream inputStream = httpResponse.getEntity().getContent();
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -71,9 +89,7 @@ public class UsuariosTask extends AsyncTask<String, Void, Usuarios> {
 			inputStream.close();	
 			//Log.i("SOFTAPP", resultStr.toString());
 			
-			Gson gson = new Gson();
-			Usuarios usuarios = gson.fromJson(resultStr.toString(), Usuarios.class);	
-			return usuarios;
+			return resultStr.toString();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

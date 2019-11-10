@@ -30,6 +30,7 @@ import xavier.ricardo.softws.tipos.Agenda;
 import xavier.ricardo.softws.tipos.AgendaMes;
 import xavier.ricardo.softws.tipos.Anexo;
 import xavier.ricardo.softws.tipos.Compromisso;
+import xavier.ricardo.softws.tipos.Encerramento;
 import xavier.ricardo.softws.tipos.Pdf;
 import xavier.ricardo.softws.tipos.Pedido;
 import xavier.ricardo.softws.tipos.Usuarios;
@@ -39,7 +40,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.0.0(12/10/2019)";
+		return "soft v2.1.0(02/11/2019)";
 	}
 
 	@GET
@@ -127,6 +128,24 @@ public class SoftService {
 			e.printStackTrace();
 			return e.getMessage();
 		}		
+		return "ok";
+	}
+	
+	@POST
+	@Path("/encerra")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String encerra(String json) {
+		
+		System.out.println(new Date() + " softws agenda encerra");
+		System.out.println(json);
+		try {
+			Gson gson = new Gson();
+			Encerramento encerramento = gson.fromJson(json, Encerramento.class);					
+			AgendaDao.encerra(encerramento.getUsuario(), encerramento.getData(), encerramento.getObservacao());
+		} catch (SQLException | NamingException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
 		return "ok";
 	}
 	
