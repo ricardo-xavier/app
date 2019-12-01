@@ -235,9 +235,20 @@ public class MainActivity extends ActionBarActivity {
 	public void encerrar(View v) {
 
 		String chave = (String) v.getTag();
-		Intent intent = new Intent(this, EncerrarActivity.class);
-		intent.putExtra("chave", chave);
-		startActivityForResult(intent, 1);
+		
+		String[] partes = chave.split(";");
+		String usuario = partes[0].trim();
+		String dt = partes[1].trim();
+		for (Compromisso compromisso : agenda.getCompromissos()) {
+			if (compromisso.getUsuario().trim().equals(usuario)
+					&& compromisso.getData().trim().equals(dt)) {
+				Intent intent = new Intent(this, EncerrarActivity.class);
+				intent.putExtra("chave", chave);
+				startActivityForResult(intent, 1);
+				break;
+			}
+		}		
+		
 		
 	}	
 	

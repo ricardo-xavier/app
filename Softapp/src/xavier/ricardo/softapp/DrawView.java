@@ -1,4 +1,4 @@
-	package xavier.ricardo.softapp;
+package xavier.ricardo.softapp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,11 @@ import android.view.View;
 
 public class DrawView extends View {
 	
-	private static final int HEIGHT = 200;
+	private static final int HEIGHT = 250;
 	
-	private List<List<Ponto>> partes = new ArrayList<List<Ponto>>();
-	private List<Ponto> pontos = new ArrayList<Ponto>();
+	private static List<List<Ponto>> partes = new ArrayList<List<Ponto>>();
+	private static List<Ponto> pontos = new ArrayList<Ponto>();
+	private static boolean readOnly;
 	
 	public DrawView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -24,6 +25,11 @@ public class DrawView extends View {
         setOnTouchListener(new OnTouchListener() { 
         	@Override 
         	public boolean onTouch(View view, MotionEvent event) { 
+        		
+        		if (readOnly) {
+        			return true;
+        		}
+        		
         		switch (event.getAction()) {
         		
         		case 0: // aperta
@@ -85,8 +91,36 @@ public class DrawView extends View {
 	}
 
 	public void limpa() {
+		for (List<Ponto> pontos : partes) {
+			pontos.clear();
+		}
 		partes.clear();
+		pontos.clear();
 		invalidate();
+	}
+
+	public static List<Ponto> getPontos() {
+		return pontos;
+	}
+
+	public static void setPontos(List<Ponto> pontos) {
+		DrawView.pontos = pontos;
+	}
+
+	public static boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public static void setReadOnly(boolean readOnly) {
+		DrawView.readOnly = readOnly;
+	}
+
+	public static List<List<Ponto>> getPartes() {
+		return partes;
+	}
+
+	public static void setPartes(List<List<Ponto>> partes) {
+		DrawView.partes = partes;
 	}
 
 }

@@ -123,10 +123,13 @@ public class AgendaAdapter extends BaseAdapter {
 		
 		Button btEncerrar = (Button) v.findViewById(R.id.btEncerrar);
 		btEncerrar.setVisibility(View.VISIBLE);
-		String chave = String.format("%s;%s;%s", 
+		String chave = String.format("%s;%s;%s;%s;%s;%s;%s", 
 				compromisso.getUsuario(), compromisso.getData(), 
-				compromisso.getEncerramento() != null 
-				? compromisso.getEncerramento() : "");
+				compromisso.getEncerramento() != null ? compromisso.getEncerramento() : "",
+				compromisso.getNome() != null ? compromisso.getNome() : "",
+				compromisso.getDocumento() != null ? compromisso.getDocumento() : "",
+				compromisso.getEmail() != null ? compromisso.getEmail() : "",
+				compromisso.getJson() != null ? compromisso.getJson() : "");
 		btEncerrar.setTag(chave);
 		
 		Button btAnexos = (Button) v.findViewById(R.id.btAnexos);

@@ -16,6 +16,8 @@ import com.google.gson.Gson;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import xavier.ricardo.softapp.Assinatura;
+import xavier.ricardo.softapp.DrawView;
 import xavier.ricardo.softapp.Encerramento;
 import xavier.ricardo.softapp.EncerrarActivity;
 
@@ -26,12 +28,19 @@ public class EncerramentoTask extends AsyncTask<String, Void, String> {
 	private String usuario;
 	private String data;
 	private String observacao;
+	private String nome;
+	private String documento;
+	private String email;
 	
-	public EncerramentoTask(EncerrarActivity contexto, String usuario, String data, String observacao) {
+	public EncerramentoTask(EncerrarActivity contexto, String usuario, String data, String observacao,
+			String nome, String documento, String email) {
 		this.contexto = contexto;
 		this.usuario = usuario;
 		this.observacao = observacao;
 		this.data = data;
+		this.nome = nome;
+		this.documento = documento;
+		this.email = email;
 	}
 	
 	@Override
@@ -71,6 +80,12 @@ public class EncerramentoTask extends AsyncTask<String, Void, String> {
 			encerramento.setUsuario(usuario);
 			encerramento.setData(data);
 			encerramento.setObservacao(observacao);
+			encerramento.setNome(nome);
+			encerramento.setDocumento(documento);
+			encerramento.setEmail(email);
+			Assinatura assinatura = new Assinatura();
+			assinatura.setPartes(DrawView.getPartes());
+			encerramento.setAssinatura(assinatura);
 			
 			Gson gson = new Gson();
 			String json = gson.toJson(encerramento, Encerramento.class);
