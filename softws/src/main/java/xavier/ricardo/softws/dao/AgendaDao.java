@@ -14,10 +14,14 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.google.gson.Gson;
+
 import xavier.ricardo.softws.tipos.Agenda;
 import xavier.ricardo.softws.tipos.AgendaMes;
 import xavier.ricardo.softws.tipos.Anexo;
+import xavier.ricardo.softws.tipos.Assinatura;
 import xavier.ricardo.softws.tipos.Compromisso;
+import xavier.ricardo.softws.tipos.Encerramento;
 
 public class AgendaDao {
 
@@ -27,7 +31,8 @@ public class AgendaDao {
 		
 		List<Compromisso> compromissos = new ArrayList<Compromisso>();
 		
-		String sql = String.format("select a.COD_USUARIO, a.DAT_AGENDAMENTO, a.DAT_PREVISAO, a.COD_NATUREZA, a.COD_PARCEIRO, a.DES_PENDENCIA, a.DES_ENCERRAMENTO, "
+		String sql = String.format("select a.COD_USUARIO, a.DAT_AGENDAMENTO, a.DAT_PREVISAO, a.COD_NATUREZA, a.COD_PARCEIRO, a.DES_PENDENCIA, "
+				+ "a.DES_ENCERRAMENTO, a.DES_NOME, a.DES_DOCUMENTO, a.DES_EMAIL, a.DES_JSON, "
 				+ "a.COD_CONTATO, c.DES_PAPEL, c.NRO_FONE1, c.NRO_FONE2, c.NRO_CELULAR, p.DES_LOGRADOURO, p.NRO_ENDERECO, "
 				+ "p.DES_COMPLEMENTO, p.NOM_BAIRRO, p.NOM_CIDADE "
 				+ "from AGENDA a "
@@ -72,6 +77,10 @@ public class AgendaDao {
 			String bairro = cursor.getString("NOM_BAIRRO");
 			String cidade = cursor.getString("NOM_CIDADE");
 			String encerramento = cursor.getString("DES_ENCERRAMENTO");
+			String nome = cursor.getString("DES_NOME");
+			String documento = cursor.getString("DES_DOCUMENTO");
+			String email = cursor.getString("DES_EMAIL");
+			String json = cursor.getString("DES_JSON");
 			compromisso.setUsuario(usuario);
 			compromisso.setData(df.format(datAgendamento));
 			compromisso.setHora(hora);
@@ -89,6 +98,10 @@ public class AgendaDao {
 			compromisso.setBairro(bairro);
 			compromisso.setCidade(cidade);
 			compromisso.setEncerramento(encerramento);
+			compromisso.setNome(nome);
+			compromisso.setDocumento(documento);
+			compromisso.setEmail(email);
+			compromisso.setJson(json);
 			/*
 			System.out.println(hora + " " + natureza + " " + parceiro
 					+ " " + fone1 + " " + fone2 + " " + celular);
@@ -260,21 +273,35 @@ public class AgendaDao {
 		return agenda;
 	}
 
-	public static void encerra(String usuario, String data, String observacao) throws SQLException, NamingException {
+	public static void encerra(Encerramento encerramento) throws SQLException, NamingException {
 		
 		String sql = String.format("update AGENDA set "
 				+ " DAT_APP = ? "
 				+ ",DES_ENCERRAMENTO = ? "
+				+ ",DES_NOME = ? "
+				+ ",DES_DOCUMENTO = ? "
+				+ ",DES_EMAIL = ? "
+				+ ",DES_JSON = ? "
 				+ "where COD_USUARIO='%s' "
 				+ "and DAT_AGENDAMENTO='%s'",
-				usuario, data);
+				encerramento.getUsuario(), encerramento.getData());
+		Gson gson = new Gson();
+		String json = null;
+		if (encerramento.getAssinatura() != null) {
+			json = gson.toJson(encerramento.getAssinatura(), Assinatura.class);
+		}
 		
 		Connection bd = BancoDados.conecta();
 		PreparedStatement cmd = bd.prepareStatement(sql);
 		cmd.setDate(1, new java.sql.Date(new Date().getTime()));
-		cmd.setString(2, observacao);
+		cmd.setString(2, encerramento.getObservacao());
+		cmd.setString(3, encerramento.getNome());
+		cmd.setString(4, encerramento.getDocumento());
+		cmd.setString(5, encerramento.getEmail());
+		cmd.setString(6, json);
 		cmd.executeUpdate();
 		cmd.close();
+		
 		bd.close();
 	}
 

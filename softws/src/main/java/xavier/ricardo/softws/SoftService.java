@@ -40,7 +40,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.1.0(02/11/2019)";
+		return "soft v2.2.0(30/11/2019)";
 	}
 
 	@GET
@@ -141,7 +141,7 @@ public class SoftService {
 		try {
 			Gson gson = new Gson();
 			Encerramento encerramento = gson.fromJson(json, Encerramento.class);					
-			AgendaDao.encerra(encerramento.getUsuario(), encerramento.getData(), encerramento.getObservacao());
+			AgendaDao.encerra(encerramento);
 		} catch (SQLException | NamingException e) {
 			e.printStackTrace();
 			return e.getMessage();
