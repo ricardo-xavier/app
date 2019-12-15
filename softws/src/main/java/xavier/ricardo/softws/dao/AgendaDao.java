@@ -272,6 +272,24 @@ public class AgendaDao {
 		agenda.setDias(dias);
 		return agenda;
 	}
+	
+
+	public static String getCliente(Connection bd, String usuario, String data) throws SQLException, NamingException {
+		String cliente = null;
+		String sql = String.format("select COD_PARCEIRO from AGENDA "
+				+ "where COD_USUARIO='%s' "
+				+ "and DAT_AGENDAMENTO='%s'",
+				usuario, data);
+
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		ResultSet cursor = cmd.executeQuery();
+		if (cursor.next()) {
+			cliente = cursor.getString("COD_PARCEIRO");
+		}
+		cursor.close();
+		cmd.close();
+		return cliente;
+	}	
 
 	public static void encerra(Encerramento encerramento) throws SQLException, NamingException {
 		
