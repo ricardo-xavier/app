@@ -273,7 +273,6 @@ public class AgendaDao {
 		return agenda;
 	}
 	
-
 	public static String getCliente(Connection bd, String usuario, String data) throws SQLException, NamingException {
 		String cliente = null;
 		String sql = String.format("select COD_PARCEIRO from AGENDA "
@@ -289,6 +288,23 @@ public class AgendaDao {
 		cursor.close();
 		cmd.close();
 		return cliente;
+	}	
+	
+	public static String getPendencia(Connection bd, String usuario, String data) throws SQLException, NamingException {
+		String pendencia = null;
+		String sql = String.format("select DES_PENDENCIA from AGENDA "
+				+ "where COD_USUARIO='%s' "
+				+ "and DAT_AGENDAMENTO='%s'",
+				usuario, data);
+
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		ResultSet cursor = cmd.executeQuery();
+		if (cursor.next()) {
+			pendencia = cursor.getString("DES_PENDENCIA");
+		}
+		cursor.close();
+		cmd.close();
+		return pendencia;
 	}	
 
 	public static void encerra(Encerramento encerramento) throws SQLException, NamingException {

@@ -37,7 +37,7 @@ import xavier.ricardo.softws.tipos.Ponto;
 
 public class Pdf {
 
-	public void gera(String arq, Encerramento encerramento, Funcionario func, Endereco filial, Cliente cliente, List<Contato> contatos) throws IOException {
+	public void gera(String arq, Encerramento encerramento, Funcionario func, Endereco filial, Cliente cliente, List<Contato> contatos, String objetivo) throws IOException {
 		
 	      PdfWriter writer = new PdfWriter(arq);           
 	      
@@ -91,28 +91,32 @@ public class Pdf {
 
 	      if (filial.getRua() != null) {
 	    	  canvas.beginText();
-	    	  canvas.moveText(10, size.getHeight() - 550).showText(filial.getRua().trim() + ", " + filial.getNumero().trim());
+	    	  canvas.moveText(10, size.getHeight() - 760).showText(filial.getRua().trim() + ", " + filial.getNumero().trim());
 	    	  canvas.endText();
 	      }
 	      if (filial.getBairro() != null) {
 	    	  canvas.beginText();
-	    	  canvas.moveText(10, size.getHeight() - 565).showText(filial.getBairro().trim());
+	    	  canvas.moveText(10, size.getHeight() - 775).showText(filial.getBairro().trim());
 	    	  canvas.endText();
 	      }
 	      if (filial.getCidade() != null) {
 	    	  canvas.beginText();
-	    	  canvas.moveText(10, size.getHeight() - 580).showText(filial.getCidade().trim());
+	    	  canvas.moveText(10, size.getHeight() - 790).showText(filial.getCidade().trim());
 	    	  canvas.endText();
 	      }
 	      if (filial.getCep() != null) {
 	    	  canvas.beginText();
-	    	  canvas.moveText(10, size.getHeight() - 595).showText("CEP: " + formataCep(filial.getCep().trim()));
+	    	  canvas.moveText(10, size.getHeight() - 805).showText("CEP: " + formataCep(filial.getCep().trim()));
 	    	  canvas.endText();
 	      }
 	      
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA_BOLD), 12);
 	      canvas.beginText();
-	      canvas.moveText(210, size.getHeight() - 70).showText("ENCERRAMENTO AGENDAMENTO ");
+	      String amd = encerramento.getData().split(" ")[0];
+	      // yyyy-mm-dd
+	      // 01234567890
+	      String dma = amd.substring(8,  10) + "/" + amd.substring(5, 7) + "/" + amd.substring(0, 4);
+	      canvas.moveText(210, size.getHeight() - 70).showText("ENCERRAMENTO AGENDAMENTO " + dma);
 	      canvas.endText();
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA), 12);
 
@@ -129,15 +133,23 @@ public class Pdf {
 		    	  canvas.moveText(220, size.getHeight() - 120).showText(cliente.getNome().trim());
 		    	  canvas.endText();
 		      }
-		      if (encerramento.getNome() != null) {
+		      if ((contatos != null) && (contatos.size() > 0)) {
+		    	  Contato contato = contatos.get(0);
+		    	  if (encerramento.getNome() != null) {
+		    		  for (Contato c : contatos) {
+		    			  if (c.getNome().trim().equalsIgnoreCase(encerramento.getNome().trim())) {
+		    				  contato = c;
+		    				  break;
+		    			  }
+		    		  }
+		    	  }
 		    	  canvas.beginText();
-		    	  canvas.moveText(220, size.getHeight() - 135).showText(encerramento.getNome().trim());
+		    	  canvas.moveText(220, size.getHeight() - 135).showText(contato.getNome().trim());
 		    	  canvas.endText();
 		      }	    	  		      		      
 		      if (cliente.getEndereco() != null) {
-		    	  canvas.beginText();
-		    	  canvas.moveText(220, size.getHeight() - 135).showText(cliente.getEndereco().trim());
-		    	  canvas.endText();
+		    	  String endereco = cliente.getEndereco().trim();
+		    	  imprimeTexto(canvas, (int) size.getHeight(), 150, endereco);
 		      }	    	  		      
 	      }
 
@@ -148,6 +160,12 @@ public class Pdf {
 	      canvas.moveText(210, size.getHeight() - 200).showText("OBJETIVO");
 	      canvas.endText();
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA), 12);
+	      if (objetivo != null) {
+	    	  objetivo = objetivo.trim();
+	    	  canvas.beginText();
+	    	  canvas.moveText(220, size.getHeight() - 220).showText(objetivo);
+	    	  canvas.endText();	    	  
+	      }
 
 	      // observações
 	      
@@ -171,7 +189,7 @@ public class Pdf {
 	      // assinatura
 	      
 	      double xAssinatura = 220;
-	      double yAssinatura = 550;
+	      double yAssinatura = 650;
 	      double yMax = 0;
 	      double k = 2.0;
 	      
@@ -205,6 +223,37 @@ public class Pdf {
 	      doc.close();  		
 	}
 	
+	private void imprimeLinha(PdfCanvas canvas, int y, String texto) {
+		canvas.beginText();
+		canvas.moveText(220, y).showText(texto);
+		canvas.endText();		
+	}
+	
+	private void imprimeTexto(PdfCanvas canvas, int height, int pos, String texto) {
+
+		while (texto.contains("  ")) {
+			texto = texto.replace("  ", " ");
+		}
+		
+		String[] palavras = texto.split(" ");
+		int y = height - pos;
+		
+		StringBuffer linha = new StringBuffer();
+		for (int p=0; p<palavras.length; p++) {
+			if ((linha.length() + palavras[p].length()) > 50) {
+				imprimeLinha(canvas, y, linha.toString());
+				y -= 15;
+				linha = new StringBuffer();
+			}
+			linha.append(palavras[p] + " ");
+		}
+		if (linha.length() > 0) {
+			imprimeLinha(canvas, y, linha.toString());
+		}
+		
+
+	}
+
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NamingException, SQLException {
 		
 		BufferedReader reader = new BufferedReader(new FileReader("teste.txt"));
@@ -230,6 +279,9 @@ public class Pdf {
 				contatos = ClienteDao.getContatos(bd, codCliente);
 			}
 		}
+		
+		String objetivo = AgendaDao.getPendencia(bd, encerramento.getUsuario(), encerramento.getData());
+		
 		bd.close();
 		/*
 		Funcionario func = new Funcionario();
@@ -237,7 +289,7 @@ public class Pdf {
 		func.setFone("31991038581");
 		*/
 		
-		new Pdf().gera("teste.pdf", encerramento, func, filial, cliente, contatos);
+		new Pdf().gera("teste.pdf", encerramento, func, filial, cliente, contatos, objetivo);
 	}
 	
 	private String formataFone(String fone) {
