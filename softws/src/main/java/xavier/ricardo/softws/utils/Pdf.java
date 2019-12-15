@@ -22,13 +22,16 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Image;
 
+import xavier.ricardo.softws.dao.FilialDao;
+import xavier.ricardo.softws.dao.FuncionarioDao;
 import xavier.ricardo.softws.tipos.Encerramento;
+import xavier.ricardo.softws.tipos.Endereco;
 import xavier.ricardo.softws.tipos.Funcionario;
 import xavier.ricardo.softws.tipos.Ponto;
 
 public class Pdf {
 
-	public void gera(String arq, Encerramento encerramento, Funcionario func) throws IOException {
+	public void gera(String arq, Encerramento encerramento, Funcionario func, Endereco filial) throws IOException {
 		
 	      PdfWriter writer = new PdfWriter(arq);           
 	      
@@ -73,6 +76,19 @@ public class Pdf {
 	    	  canvas.endText();
 	      }
 
+    	  canvas.beginText();
+    	  canvas.moveText(10, size.getHeight() - 550).showText(filial.getRua().trim() + ", " + filial.getNumero().trim());
+    	  canvas.endText();
+    	  canvas.beginText();
+    	  canvas.moveText(10, size.getHeight() - 565).showText(filial.getBairro().trim());
+    	  canvas.endText();
+    	  canvas.beginText();
+    	  canvas.moveText(10, size.getHeight() - 580).showText(filial.getCidade().trim());
+    	  canvas.endText();
+    	  canvas.beginText();
+    	  canvas.moveText(10, size.getHeight() - 595).showText("CEP: ");
+    	  canvas.endText();
+	      
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA_BOLD), 12);
 	      canvas.beginText();
 	      canvas.moveText(210, size.getHeight() - 70).showText("ENCERRAMENTO AGENDAMENTO ");
@@ -96,6 +112,17 @@ public class Pdf {
 	      canvas.moveText(210, size.getHeight() - 300).showText("OBSERVAÇÕES");
 	      canvas.endText();
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA), 12);
+	      
+	      if (encerramento.getObservacao() != null) {
+	    	  String[] linhas = encerramento.getObservacao().split("\\n");
+	    	  double y = size.getHeight() - 320;
+	    	  for (String linha : linhas) {
+	    	      canvas.beginText();
+	    	      canvas.moveText(220, y).showText(linha);
+	    	      canvas.endText();	    		  
+	    	      y -= 18;
+	    	  }
+	      }
 	      
 	      double xAssinatura = 220;
 	      double yAssinatura = 550;
@@ -144,12 +171,15 @@ public class Pdf {
 		Gson gson = new Gson();
 		Encerramento encerramento = gson.fromJson(json.toString(), Encerramento.class);
 		
-		//Funcionario func = FuncionarioDao.get(encerramento.getUsuario());
+		Funcionario func = FuncionarioDao.get(encerramento.getUsuario());
+		Endereco filial = FilialDao.get("BHZ");
+		/*
 		Funcionario func = new Funcionario();
 		func.setNome("FABIANA FRANCO FERRARI");
 		func.setFone("31991038581");
+		*/
 		
-		new Pdf().gera("teste.pdf", encerramento, func);
+		new Pdf().gera("teste.pdf", encerramento, func, filial);
 	}
 	
 	private String formataFone(String fone) {
