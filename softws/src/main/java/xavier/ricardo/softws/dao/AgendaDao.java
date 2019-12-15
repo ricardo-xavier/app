@@ -273,9 +273,9 @@ public class AgendaDao {
 		return agenda;
 	}
 	
-	public static String getCliente(Connection bd, String usuario, String data) throws SQLException, NamingException {
-		String cliente = null;
-		String sql = String.format("select COD_PARCEIRO from AGENDA "
+	public static List<String> getDadosPdf(Connection bd, String usuario, String data) throws SQLException, NamingException {
+		List<String> dados = new ArrayList<String>();
+		String sql = String.format("select COD_PARCEIRO, DES_PENDENCIA, DAT_APP, COD_CONTATO from AGENDA "
 				+ "where COD_USUARIO='%s' "
 				+ "and DAT_AGENDAMENTO='%s'",
 				usuario, data);
@@ -283,30 +283,20 @@ public class AgendaDao {
 		PreparedStatement cmd = bd.prepareStatement(sql);
 		ResultSet cursor = cmd.executeQuery();
 		if (cursor.next()) {
-			cliente = cursor.getString("COD_PARCEIRO");
+			String cliente = cursor.getString("COD_PARCEIRO");
+			String objetivo = cursor.getString("DES_PENDENCIA");
+			String dataEncerramento = cursor.getString("DAT_APP");
+			String contato = cursor.getString("COD_CONTATO");
+			dados.add(cliente);
+			dados.add(objetivo);
+			dados.add(dataEncerramento);
+			dados.add(contato);
 		}
 		cursor.close();
 		cmd.close();
-		return cliente;
+		return dados;
 	}	
 	
-	public static String getPendencia(Connection bd, String usuario, String data) throws SQLException, NamingException {
-		String pendencia = null;
-		String sql = String.format("select DES_PENDENCIA from AGENDA "
-				+ "where COD_USUARIO='%s' "
-				+ "and DAT_AGENDAMENTO='%s'",
-				usuario, data);
-
-		PreparedStatement cmd = bd.prepareStatement(sql);
-		ResultSet cursor = cmd.executeQuery();
-		if (cursor.next()) {
-			pendencia = cursor.getString("DES_PENDENCIA");
-		}
-		cursor.close();
-		cmd.close();
-		return pendencia;
-	}	
-
 	public static void encerra(Encerramento encerramento) throws SQLException, NamingException {
 		
 		String sql = String.format("update AGENDA set "

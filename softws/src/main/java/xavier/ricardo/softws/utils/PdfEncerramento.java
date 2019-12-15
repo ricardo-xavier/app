@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -35,9 +38,9 @@ import xavier.ricardo.softws.tipos.Endereco;
 import xavier.ricardo.softws.tipos.Funcionario;
 import xavier.ricardo.softws.tipos.Ponto;
 
-public class Pdf {
+public class PdfEncerramento {
 
-	public void gera(String arq, Encerramento encerramento, Funcionario func, Endereco filial, Cliente cliente, List<Contato> contatos, String objetivo) throws IOException {
+	public void gera(String arq, Encerramento encerramento, Funcionario func, Endereco filial, Cliente cliente, Contato contato, String objetivo, String dataEncerramento) throws IOException {
 		
 	      PdfWriter writer = new PdfWriter(arq);           
 	      
@@ -112,7 +115,7 @@ public class Pdf {
 	      
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA_BOLD), 12);
 	      canvas.beginText();
-	      String amd = encerramento.getData().split(" ")[0];
+	      String amd = dataEncerramento.split(" ")[0];
 	      // yyyy-mm-dd
 	      // 01234567890
 	      String dma = amd.substring(8,  10) + "/" + amd.substring(5, 7) + "/" + amd.substring(0, 4);
@@ -133,18 +136,11 @@ public class Pdf {
 		    	  canvas.moveText(220, size.getHeight() - 120).showText(cliente.getNome().trim());
 		    	  canvas.endText();
 		      }
-		      if ((contatos != null) && (contatos.size() > 0)) {
-		    	  Contato contato = contatos.get(0);
-		    	  if (encerramento.getNome() != null) {
-		    		  for (Contato c : contatos) {
-		    			  if (c.getNome().trim().equalsIgnoreCase(encerramento.getNome().trim())) {
-		    				  contato = c;
-		    				  break;
-		    			  }
-		    		  }
-		    	  }
+		      if (contato != null) {
 		    	  canvas.beginText();
-		    	  canvas.moveText(220, size.getHeight() - 135).showText(contato.getNome().trim());
+		    	  String fone = contato.getFone().split(" - ")[0];
+		    	  fone = formataFone(fone.trim());
+		    	  canvas.moveText(220, size.getHeight() - 135).showText(contato.getNome().trim() + " - " + fone);
 		    	  canvas.endText();
 		      }	    	  		      		      
 		      if (cliente.getEndereco() != null) {
@@ -254,6 +250,64 @@ public class Pdf {
 
 	}
 
+	public void gera(String json) throws IOException, NoSuchAlgorithmException, NamingException, SQLException {
+		
+		Gson gson = new Gson();
+		Encerramento encerramento = gson.fromJson(json.toString(), Encerramento.class);
+		
+		Funcionario func = FuncionarioDao.get(encerramento.getUsuario());
+		Endereco filial = FilialDao.get("BHZ");
+		
+		Connection bd = BancoDados.conecta();
+		Cliente cliente = null;
+		String objetivo = null;
+		String dataEncerramento = null;
+		Contato contato = null;
+		List<String> dados = AgendaDao.getDadosPdf(bd, encerramento.getUsuario(), encerramento.getData());
+		if (dados.size() > 0) {
+			String codCliente = dados.get(0);
+			objetivo = dados.get(1);
+			dataEncerramento = dados.get(2);
+			String codContato = dados.get(3);
+			if (codContato != null) {
+				codContato = codContato.trim().toUpperCase();
+			}
+			
+			if (codCliente != null) {
+				cliente = ClienteDao.get(codCliente);
+				if (cliente != null) {
+					List<Contato> contatos = ClienteDao.getContatos(bd, codCliente);
+					for (Contato c : contatos) {
+						if (contato == null) {
+							contato = c;
+						}
+						if ((codContato != null) && c.getNome().toUpperCase().contains(codContato)) {
+							contato = c;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		bd.close();
+		/*
+		Funcionario func = new Funcionario();
+		func.setNome("FABIANA FRANCO FERRARI");
+		func.setFone("31991038581");
+		*/
+		
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+		String pdf = "/tmp/encerramento_" + df.format(new Date()) + ".pdf";
+		new PdfEncerramento().gera(pdf, encerramento, func, filial, cliente, contato, objetivo, dataEncerramento);
+		
+		Email.envia("softplacemoveisbh@gmail.com", "ricardo.costa.xavier@gmail.com", 
+				"softplacemoveisbh@gmail.com", "soft101010", 
+				"Encerramento do agendamento Softplace", 
+				"Esse email foi enviado automaticamente pelo SoftApp devido ao encerramento do seu agendamento.", 
+				pdf);
+	}
+	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NamingException, SQLException {
 		
 		BufferedReader reader = new BufferedReader(new FileReader("teste.txt"));
@@ -263,33 +317,8 @@ public class Pdf {
 			json.append(linha + "\n");
 		}
 		reader.close();
-		Gson gson = new Gson();
-		Encerramento encerramento = gson.fromJson(json.toString(), Encerramento.class);
 		
-		Funcionario func = FuncionarioDao.get(encerramento.getUsuario());
-		Endereco filial = FilialDao.get("BHZ");
-		
-		Connection bd = BancoDados.conecta();
-		String codCliente = AgendaDao.getCliente(bd, encerramento.getUsuario(), encerramento.getData());
-		Cliente cliente = null;
-		List<Contato> contatos = null;
-		if (codCliente != null) {
-			cliente = ClienteDao.get(codCliente);
-			if (cliente != null) {
-				contatos = ClienteDao.getContatos(bd, codCliente);
-			}
-		}
-		
-		String objetivo = AgendaDao.getPendencia(bd, encerramento.getUsuario(), encerramento.getData());
-		
-		bd.close();
-		/*
-		Funcionario func = new Funcionario();
-		func.setNome("FABIANA FRANCO FERRARI");
-		func.setFone("31991038581");
-		*/
-		
-		new Pdf().gera("teste.pdf", encerramento, func, filial, cliente, contatos, objetivo);
+		new PdfEncerramento().gera(json.toString());
 	}
 	
 	private String formataFone(String fone) {
@@ -298,10 +327,15 @@ public class Pdf {
   		  // 012345678
   		  // 988749526
   		  return fone.substring(0, 5) + "-" + fone.substring(5);
+  	  case 10:
+  		  // 0123456789
+  		  // 3133789526
+  		  return "(" + fone.substring(0, 2) + ")"
+  				  + fone.substring(2, 6) + "-" + fone.substring(6);  		  
   	  case 11:
   		  // 01234567890
   		  // 31988749526
-  		  return "(" + fone.substring(0, 3) + ")"
+  		  return "(" + fone.substring(0, 2) + ")"
   				  + fone.substring(2, 7) + "-" + fone.substring(7);
   	  }
   	  return fone;

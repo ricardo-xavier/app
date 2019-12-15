@@ -34,6 +34,7 @@ import xavier.ricardo.softws.tipos.Encerramento;
 import xavier.ricardo.softws.tipos.Pdf;
 import xavier.ricardo.softws.tipos.Pedido;
 import xavier.ricardo.softws.tipos.Usuarios;
+import xavier.ricardo.softws.utils.PdfEncerramento;
 
 public class SoftService {
 
@@ -142,7 +143,9 @@ public class SoftService {
 			Gson gson = new Gson();
 			Encerramento encerramento = gson.fromJson(json, Encerramento.class);					
 			AgendaDao.encerra(encerramento);
-		} catch (SQLException | NamingException e) {
+			PdfEncerramento pdf = new PdfEncerramento();
+			pdf.gera(json);
+		} catch (SQLException | NamingException | NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
