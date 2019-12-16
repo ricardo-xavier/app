@@ -301,11 +301,26 @@ public class PdfEncerramento {
 		String pdf = "/tmp/encerramento_" + df.format(new Date()) + ".pdf";
 		new PdfEncerramento().gera(pdf, encerramento, func, filial, cliente, contato, objetivo, dataEncerramento);
 		
-		Email.envia("softplacemoveisbh@gmail.com", "ricardo.costa.xavier@gmail.com", 
-				"softplacemoveisbh@gmail.com", "soft101010", 
+		try {
+			System.err.println("enviando email 587 ricardo");
+			/*
+			Email.envia("softapp", "fabiana.ferrari@softplacemoveis.com.br", 
+				"softapp", "softapp", 
 				"Encerramento do agendamento Softplace", 
 				"Esse email foi enviado automaticamente pelo SoftApp devido ao encerramento do seu agendamento.", 
 				pdf);
+			*/
+			Email.envia("softplacemoveisbh@gmail.com", 
+					"fabiana.ferrari@softplacemoveis.com.br;ricardo.costa.xavier@gmail.com", 
+					"softplacemoveisbh", "soft101010", 
+					"Encerramento do agendamento Softplace", 
+					"Esse email foi enviado automaticamente pelo SoftApp. Em anexo, relatório de encerramento do agendamento.", 
+					pdf);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NamingException, SQLException {
