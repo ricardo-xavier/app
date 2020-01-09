@@ -41,7 +41,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.3.0(14/12/2019)";
+		return "soft v2.4.0(08/01/2020)";
 	}
 
 	@GET

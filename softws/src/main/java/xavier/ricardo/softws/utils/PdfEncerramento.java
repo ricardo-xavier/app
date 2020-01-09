@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -156,24 +157,29 @@ public class PdfEncerramento {
 	      canvas.moveText(210, size.getHeight() - 200).showText("OBJETIVO");
 	      canvas.endText();
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA), 12);
+	      double y = size.getHeight() - 220;
 	      if (objetivo != null) {
-	    	  objetivo = objetivo.trim();
-	    	  canvas.beginText();
-	    	  canvas.moveText(220, size.getHeight() - 220).showText(objetivo);
-	    	  canvas.endText();	    	  
+	    	  List<String> linhas = split(objetivo.trim(), 60);
+	    	  for (String linha : linhas) {
+	    	      canvas.beginText();
+	    	      canvas.moveText(220, y).showText(linha);
+	    	      canvas.endText();	    		  
+	    	      y -= 18;
+	    	  }
 	      }
+	      y -= 20;
 
 	      // observações
 	      
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA_BOLD), 12);
 	      canvas.beginText();
-	      canvas.moveText(210, size.getHeight() - 300).showText("OBSERVAÇÕES");
+	      canvas.moveText(210, y).showText("OBSERVAÇÕES");
+	      y -= 20;
 	      canvas.endText();
 	      canvas.setFontAndSize(PdfFontFactory.createFont(FontConstants.HELVETICA), 12);
 	      
 	      if (encerramento.getObservacao() != null) {
 	    	  String[] linhas = encerramento.getObservacao().split("\\n");
-	    	  double y = size.getHeight() - 320;
 	    	  for (String linha : linhas) {
 	    	      canvas.beginText();
 	    	      canvas.moveText(220, y).showText(linha);
@@ -185,7 +191,7 @@ public class PdfEncerramento {
 	      // assinatura
 	      
 	      double xAssinatura = 220;
-	      double yAssinatura = 650;
+	      double yAssinatura = 600;
 	      double yMax = 0;
 	      double k = 2.0;
 	      
@@ -197,7 +203,7 @@ public class PdfEncerramento {
 	    			  if (ponto.getY() > yMax) {
 	    				  yMax = ponto.getY();
 	    			  }
-	    			  double y = size.getHeight() - (double) ponto.getY() / k - yAssinatura;
+	    			  y = size.getHeight() - (double) ponto.getY() / k - yAssinatura;
 	    			  if (primeiro) {
 	    				  canvas.moveTo(x, y);
 	    				  primeiro = false;
@@ -219,6 +225,23 @@ public class PdfEncerramento {
 	      doc.close();  		
 	}
 	
+	private List<String> split(String s, int n) {
+		List<String> resp = new ArrayList<String>();
+		String[] partes = s.split(" ");
+		StringBuilder buf = new StringBuilder();
+		for (String parte : partes) {
+			if ((buf.length() + parte.length()) > n) {
+				resp.add(buf.toString());
+				buf = new StringBuilder();
+			}
+			buf.append(parte + " ");
+		}
+		if (buf.length() > 0) {
+			resp.add(buf.toString());
+		}
+		return resp;
+	}
+
 	private void imprimeLinha(PdfCanvas canvas, int y, String texto) {
 		canvas.beginText();
 		canvas.moveText(220, y).showText(texto);
@@ -310,10 +333,15 @@ public class PdfEncerramento {
 				"Esse email foi enviado automaticamente pelo SoftApp devido ao encerramento do seu agendamento.", 
 				pdf);
 			*/
+			df = new SimpleDateFormat("dd/MM/yyyy");
+			String subject = "Encerramento Agendamento " + df.format(new Date());
+			if (cliente != null) {
+				subject += " - " + cliente.getNome();
+			}
 			Email.envia("softplacemoveisbh@gmail.com", 
 					"fabiana.ferrari@softplacemoveis.com.br;ricardo.costa.xavier@gmail.com", 
 					"softplacemoveisbh", "soft101010", 
-					"Encerramento do agendamento Softplace", 
+					subject, 
 					"Esse email foi enviado automaticamente pelo SoftApp. Em anexo, relatório de encerramento do agendamento.", 
 					pdf);
 			
