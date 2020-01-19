@@ -1,5 +1,6 @@
 package xavier.ricardo.softws.dao;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -88,7 +90,9 @@ public class AnexoDao {
 		System.out.println(sql);
 		Connection bd = BancoDados.conecta();
 		PreparedStatement cmd = bd.prepareStatement(sql);
-		cmd.setString(1, imagem.getImage64());
+		byte[] data = Base64.getDecoder().decode(imagem.getImage64().replace("\n", ""));
+		ByteArrayInputStream stream = new ByteArrayInputStream(data);
+		cmd.setBinaryStream(1, stream);
 		cmd.executeUpdate();
 		cmd.close();
 		

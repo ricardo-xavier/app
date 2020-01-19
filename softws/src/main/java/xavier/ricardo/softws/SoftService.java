@@ -162,7 +162,7 @@ public class SoftService {
 			Gson gson = new Gson();
 			Imagem imagem = gson.fromJson(json, Imagem.class);
 			System.out.println(new Date() + " softws foto " + imagem.getFornecedor()
-					+ " " + imagem.getData() + " " + imagem.getOrcamento() + " " + imagem.getId());			
+					+ " " + imagem.getData() + " " + imagem.getOrcamento() + " " + imagem.getId());	
 			AnexoDao.anexa(imagem);
 		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
