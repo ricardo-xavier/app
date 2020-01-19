@@ -210,7 +210,7 @@ public class AgendaDao {
 				String codigo = cursor.getString("COD_ANEXO");
 				String descricao = cursor.getString("DES_ARQ_ANEXO");
 				//String conteudo = cursor.getString("DES_CONTEUDO");
-				if (descricao.toLowerCase().trim().endsWith(".pdf")) {
+				if (descricao.toLowerCase().trim().endsWith(".pdf") || descricao.toLowerCase().trim().endsWith(".jpg")) {
 					Anexo anexo = new Anexo();
 					anexo.setCodigo(codigo);
 					compromisso.getAnexos().add(anexo);

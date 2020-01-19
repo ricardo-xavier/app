@@ -18,6 +18,7 @@ import java.util.List;
 import javax.naming.NamingException;
 
 import xavier.ricardo.softws.tipos.Anexo;
+import xavier.ricardo.softws.tipos.Imagem;
 
 public class AnexoDao {
 
@@ -43,15 +44,16 @@ public class AnexoDao {
 			
 			String codigo = cursor.getString("COD_ANEXO");
 			String descricao = cursor.getString("DES_ARQ_ANEXO");
-			if (descricao.toLowerCase().trim().endsWith(".pdf")) {
+			if (descricao.toLowerCase().trim().endsWith(".pdf") || descricao.toLowerCase().trim().endsWith(".jpg")) {
 				
 				Anexo anexo = new Anexo();
 				anexo.setCodigo(codigo);
 				anexo.setDescricao(descricao);
 				try {
 					
-					String arq = String.format("/usr/local/tomcat/webapps/ROOT/soft/%s%d%s.pdf",
-							fornecedor, orcamento, codigo.replace(" ", ""));
+					String arq = String.format("/usr/local/tomcat/webapps/ROOT/soft/%s%d%s.%s",
+							fornecedor, orcamento, codigo.replace(" ", ""),
+							descricao.toLowerCase().trim().endsWith(".pdf") ? "pdf" : "jpg");
 					System.out.println(arq);
 					File pdf = new File(arq);
 					InputStream bs = cursor.getBlob("DES_CONTEUDO").getBinaryStream();
@@ -76,5 +78,22 @@ public class AnexoDao {
 		
 		return anexos;
 	}
+	
+
+	public static void anexa(Imagem imagem) throws NamingException, SQLException {
+		
+		String sql = String.format("insert into ANEXOS_ORCAMENTO values('%s', '%s', %d, '%s', '%s.jpg', ?)",
+				imagem.getFornecedor(), imagem.getData(), imagem.getOrcamento(), imagem.getId(), imagem.getId());
+		
+		System.out.println(sql);
+		Connection bd = BancoDados.conecta();
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		cmd.setString(1, imagem.getImage64());
+		cmd.executeUpdate();
+		cmd.close();
+		
+		bd.close();		
+	}
+	
 		
 }

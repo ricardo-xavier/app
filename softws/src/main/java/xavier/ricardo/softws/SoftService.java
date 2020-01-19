@@ -31,6 +31,7 @@ import xavier.ricardo.softws.tipos.AgendaMes;
 import xavier.ricardo.softws.tipos.Anexo;
 import xavier.ricardo.softws.tipos.Compromisso;
 import xavier.ricardo.softws.tipos.Encerramento;
+import xavier.ricardo.softws.tipos.Imagem;
 import xavier.ricardo.softws.tipos.Pdf;
 import xavier.ricardo.softws.tipos.Pedido;
 import xavier.ricardo.softws.tipos.Usuarios;
@@ -41,7 +42,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.4.0(08/01/2020)";
+		return "soft v2.5.0(19/01/2020)";
 	}
 
 	@GET
@@ -146,6 +147,24 @@ public class SoftService {
 			PdfEncerramento pdf = new PdfEncerramento();
 			pdf.gera(json);
 		} catch (SQLException | NamingException | NoSuchAlgorithmException | IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		return "ok";
+	}
+	
+	@POST
+	@Path("/foto")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String foto(String json) {
+		
+		try {
+			Gson gson = new Gson();
+			Imagem imagem = gson.fromJson(json, Imagem.class);
+			System.out.println(new Date() + " softws foto " + imagem.getFornecedor()
+					+ " " + imagem.getData() + " " + imagem.getOrcamento() + " " + imagem.getId());			
+			AnexoDao.anexa(imagem);
+		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
