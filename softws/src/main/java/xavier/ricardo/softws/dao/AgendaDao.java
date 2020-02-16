@@ -329,4 +329,62 @@ public class AgendaDao {
 		bd.close();
 	}
 
+	
+	/*
+select p.nro_nf_fornec, a.dat_agendamento
+from pedidos p
+inner join pedidos_agenda pa
+  on pa.cod_fornecedor = p.cod_fornecedor
+ and pa.dat_orcamento = p.dat_orcamento
+ and pa.cod_orcamento = p.cod_orcamento
+inner join agenda a
+  on a.cod_usuario = pa.cod_usuario
+ and a.dat_agendamento = pa.dat_agendamento
+where p.nro_nf_fornec = 210361
+	 */
+	
+
+	//http://ricardoxavier.no-ip.org/soft-ws3/softws/listaNF/210361
+	public Agenda listaNF(String nf) throws NamingException, SQLException {
+		
+		List<Compromisso> compromissos = new ArrayList<Compromisso>();
+		
+		String sql = String.format("select a.COD_USUARIO, a.DAT_AGENDAMENTO, a.DAT_PREVISAO "
+				+ "from PEDIDOS p "
+				+ "inner join PEDIDOS_AGENDA pa "
+				+ "   on pa.cod_fornecedor = p.cod_fornecedor "
+				+ "  and pa.dat_orcamento = p.dat_orcamento "
+				+ "  and pa.cod_orcamento = p.cod_orcamento "
+				+ "inner join AGENDA a "
+				+ "   on a.cod_usuario = pa.cod_usuario "
+				+ "  and a.dat_agendamento = pa.dat_agendamento "
+				+ " where p.nro_nf_fornec = %s", nf);
+		
+		Connection bd = BancoDados.conecta();
+		PreparedStatement cmd = bd.prepareStatement(sql);
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		ResultSet cursor = cmd.executeQuery();
+		while (cursor.next()) {
+			
+			Compromisso compromisso = new Compromisso();
+			String usuario = cursor.getString("COD_USUARIO");
+			Date datPrevisao = new Date(cursor.getDate("DAT_PREVISAO").getTime());
+			compromisso.setUsuario(usuario);
+			compromisso.setData(df.format(datPrevisao));
+			compromissos.add(compromisso);
+			
+		}
+		
+		cursor.close();
+		cmd.close();		
+		
+		bd.close();
+		
+		Agenda agenda = new Agenda();
+		agenda.setCompromissos(compromissos);
+		return agenda;
+
+	}
 }
