@@ -42,7 +42,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.5.0(19/01/2020)";
+		return "soft v2.6.0(16/02/2020)";
 	}
 
 	@GET
@@ -86,6 +86,23 @@ public class SoftService {
 		System.out.println(new Date() + " softws agendames: " + usuario + " " + data);
 		try {
 			AgendaMes agenda = new AgendaDao().listaMes(usuario, data);
+			Gson gson = new Gson();
+			return gson.toJson(agenda);
+
+		} catch (NamingException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@GET
+	@Path("/listaNF/{nf}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAgendaNF(@PathParam("nf") String nf) {
+		
+		System.out.println(new Date() + " softws agendaNF: " + nf);
+		try {
+			Agenda agenda = new AgendaDao().listaNF(nf);
 			Gson gson = new Gson();
 			return gson.toJson(agenda);
 
