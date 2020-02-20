@@ -338,8 +338,12 @@ public class PdfEncerramento {
 			if (cliente != null) {
 				subject += " - " + cliente.getNome();
 			}
+			String destinatarios = "fabiana.ferrari@softplacemoveis.com.br;ricardo.costa.xavier@gmail.com";
+			if ((contato != null) && (contato.getEmail() != null)) {
+				destinatarios += ";" + contato.getEmail();
+			}
 			Email.envia("softplacemoveisbh@gmail.com", 
-					"fabiana.ferrari@softplacemoveis.com.br;ricardo.costa.xavier@gmail.com", 
+					destinatarios, 
 					"softplacemoveisbh", "soft101010", 
 					subject, 
 					"Esse email foi enviado automaticamente pelo SoftApp. Em anexo, relatório de encerramento do agendamento.", 
