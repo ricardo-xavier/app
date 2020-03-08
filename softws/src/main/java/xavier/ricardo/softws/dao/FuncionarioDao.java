@@ -13,10 +13,14 @@ import xavier.ricardo.softws.tipos.Funcionario;
 
 public class FuncionarioDao {
 
-	public static Funcionario get(String usuario) throws NamingException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
+	public static Funcionario get(String usuario, Connection bd) throws NamingException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		Funcionario func = null;
-		Connection bd = BancoDados.conecta();
+		boolean fechar = false;
+		if (bd == null) {
+			bd = BancoDados.conecta();
+			fechar = true;
+		}
 		
 		String sql = "select NOM_FUNCIONARIO,NRO_FONE3 from FUNCIONARIOS where COD_FUNCIONARIO='" + usuario + "' and IDT_ATIVO='S'";
 		
@@ -34,7 +38,9 @@ public class FuncionarioDao {
 		cursor.close();
 		cmd.close();		
 		
-		bd.close();
+		if (fechar) {
+			bd.close();
+		}
 		return func;
 	}
 

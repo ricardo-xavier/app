@@ -278,7 +278,7 @@ public class PdfEncerramento {
 		Gson gson = new Gson();
 		Encerramento encerramento = gson.fromJson(json.toString(), Encerramento.class);
 		
-		Funcionario func = FuncionarioDao.get(encerramento.getUsuario());
+		Funcionario func = FuncionarioDao.get(encerramento.getUsuario(), null);
 		Endereco filial = FilialDao.get("BHZ");
 		
 		Connection bd = BancoDados.conecta();
@@ -286,7 +286,9 @@ public class PdfEncerramento {
 		String objetivo = null;
 		String dataEncerramento = null;
 		Contato contato = null;
+		String chave = "";
 		List<String> dados = AgendaDao.getDadosPdf(bd, encerramento.getUsuario(), encerramento.getData());
+		
 		if (dados.size() > 0) {
 			String codCliente = dados.get(0);
 			objetivo = dados.get(1);
@@ -294,6 +296,14 @@ public class PdfEncerramento {
 			String codContato = dados.get(3);
 			if (codContato != null) {
 				codContato = codContato.trim().toUpperCase();
+			}
+			if (dados.size() > 4) {
+				chave = dados.get(4);
+			}
+			if (dados.size() > 5) {
+				String resp = dados.get(5);
+				func = FuncionarioDao.get(resp, bd);
+				System.out.println("resp=" + func.getNome() + " " + func.getFone());
 			}
 			
 			if (codCliente != null) {
@@ -321,7 +331,7 @@ public class PdfEncerramento {
 		*/
 		
 		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-		String pdf = "/tmp/encerramento_" + df.format(new Date()) + ".pdf";
+		String pdf = "/tmp/" + chave + "_encerramento_" + df.format(new Date()) + ".pdf";
 		new PdfEncerramento().gera(pdf, encerramento, func, filial, cliente, contato, objetivo, dataEncerramento);
 		
 		try {
@@ -334,9 +344,11 @@ public class PdfEncerramento {
 				pdf);
 			*/
 			df = new SimpleDateFormat("dd/MM/yyyy");
-			String subject = "Encerramento Agendamento " + df.format(new Date());
+			String subject = "[SOFTPLACE] Encerramento Agendamento " + df.format(new Date());
+			String nomeCliente = "";
 			if (cliente != null) {
-				subject += " - " + cliente.getNome();
+				nomeCliente = " - " + cliente.getNome();
+				subject += nomeCliente;
 			}
 			String destinatarios = "fabiana.ferrari@softplacemoveis.com.br;ricardo.costa.xavier@gmail.com";
 			if ((contato != null) && (contato.getEmail() != null)) {
@@ -346,7 +358,8 @@ public class PdfEncerramento {
 					destinatarios, 
 					"softplacemoveisbh", "soft101010", 
 					subject, 
-					"Esse email foi enviado automaticamente pelo SoftApp. Em anexo, relatório de encerramento do agendamento.", 
+					"Esse email foi enviado automaticamente pelo SoftApp da SOFTPLACE.\nEm anexo, relatório de encerramento do agendamento "
+							+ df.format(new Date()) + nomeCliente, 
 					pdf);
 			
 		} catch (Exception e) {
@@ -354,7 +367,7 @@ public class PdfEncerramento {
 		}
 		
 	}
-	
+	 
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NamingException, SQLException {
 		
 		BufferedReader reader = new BufferedReader(new FileReader("teste.txt"));

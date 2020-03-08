@@ -275,10 +275,16 @@ public class AgendaDao {
 	
 	public static List<String> getDadosPdf(Connection bd, String usuario, String data) throws SQLException, NamingException {
 		List<String> dados = new ArrayList<String>();
-		String sql = String.format("select COD_PARCEIRO, DES_PENDENCIA, DAT_APP, COD_CONTATO from AGENDA "
-				+ "where COD_USUARIO='%s' "
-				+ "and DAT_AGENDAMENTO='%s'",
+		String sql = String.format("select a.COD_PARCEIRO, a.DES_PENDENCIA, a.DAT_APP, a.COD_CONTATO, a.COD_RESPONSAVEL, "
+				+ "p.COD_FORNECEDOR, p.DAT_ORCAMENTO, p.COD_ORCAMENTO, p.NRO_PEDIDO "
+				+ "from AGENDA a "
+				+ "left join PEDIDOS_AGENDA pa on pa.COD_USUARIO = a.COD_USUARIO and pa.DAT_AGENDAMENTO = a.DAT_AGENDAMENTO "
+				+ "left join PEDIDOS p on p.COD_FORNECEDOR = pa.COD_FORNECEDOR and p.DAT_ORCAMENTO = pa.DAT_ORCAMENTO and "
+				+ "p.COD_ORCAMENTO = pa.COD_ORCAMENTO and p.COD_PEDIDO = pa.COD_PEDIDO " 
+				+ "where a.COD_USUARIO='%s' "
+				+ "and a.DAT_AGENDAMENTO='%s'",
 				usuario, data);
+		//System.out.println(sql);
 
 		PreparedStatement cmd = bd.prepareStatement(sql);
 		ResultSet cursor = cmd.executeQuery();
@@ -287,10 +293,22 @@ public class AgendaDao {
 			String objetivo = cursor.getString("DES_PENDENCIA");
 			String dataEncerramento = cursor.getString("DAT_APP");
 			String contato = cursor.getString("COD_CONTATO");
+			String fornecedor = cursor.getString("COD_FORNECEDOR");
+			String responsavel = cursor.getString("COD_RESPONSAVEL");
+			String chave = null;
+			if (!cursor.wasNull() && (fornecedor != null)) {
+				String dataOrcamento = cursor.getString("DAT_ORCAMENTO").replace("-", "");
+				String codOrcamento = cursor.getString("COD_ORCAMENTO");
+				String nroPedido = cursor.getString("NRO_PEDIDO");
+				chave = fornecedor.trim() + "_" + dataOrcamento.trim() + "_" + codOrcamento.trim() + "_" + nroPedido.trim();			
+			}
+			//System.out.println("chave=" + chave);
 			dados.add(cliente);
 			dados.add(objetivo);
 			dados.add(dataEncerramento);
 			dados.add(contato);
+			dados.add(chave);
+			dados.add(responsavel);
 		}
 		cursor.close();
 		cmd.close();
