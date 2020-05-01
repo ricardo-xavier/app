@@ -45,7 +45,7 @@ public class PedidoDao {
 		pedido.setAreas(new ArrayList<Area>());
 		ResultSet cursor = cmd.executeQuery();
 		
-		if (cursor.next()) {
+		while (cursor.next()) {
 		
 			String codArea = Sql.getString(cursor, "COD_AREA");
 			Area area = null;

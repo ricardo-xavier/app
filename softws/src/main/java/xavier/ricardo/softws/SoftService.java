@@ -42,7 +42,7 @@ public class SoftService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String version() {
-		return "soft v2.6.1(08/03/2020)";
+		return "soft v2.6.2(01/05/2020)";
 	}
 
 	@GET
@@ -230,3 +230,5 @@ public class SoftService {
 	}
 
 }
+
+// 01/05/2020 - 2.6.2 - só estava mostrando o primeiro item do pedido
