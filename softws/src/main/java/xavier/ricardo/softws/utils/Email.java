@@ -23,7 +23,7 @@ public class Email {
 			String filename) {
 
 		Properties props = new Properties();
-		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.host", "smtpi.kinghost.net");
 		props.put("mail.smtp.auth", "true");
 		/*
         props.put("mail.smtp.port", "465");
@@ -93,13 +93,13 @@ public class Email {
 	}
 	
 	public static void main(String[] args) {
-		String from = "softplacemoveisbh@gmail.com";
+		String from = "remoto@softp.com.br";
 		String to = "ricardo.costa.xavier@gmail.com";
-		String username = "softplacemoveisbh";
+		String username = "remoto@softp.com.br";
 		String password = "soft101010";
 		String subject = "teste";
-		String content = "/tmp/teste.txt";
-		String filename = null;
+		String content = "pom.xml";
+		String filename = "pom.xml";
 		Email.envia(from, to, username, password, subject, content, filename);
 	}
 
